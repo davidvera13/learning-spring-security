@@ -16,6 +16,7 @@
  */
 package springboot.app.brewery.repositories;
 
+import org.springframework.stereotype.Repository;
 import springboot.app.brewery.domain.Beer;
 import springboot.app.brewery.domain.BeerInventory;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+@Repository
 public interface BeerInventoryRepository extends JpaRepository<BeerInventory, UUID> {
 
     List<BeerInventory> findAllByBeer(Beer beer);

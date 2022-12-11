@@ -16,6 +16,7 @@
  */
 package springboot.app.brewery.repositories;
 
+import org.springframework.stereotype.Repository;
 import springboot.app.brewery.domain.Beer;
 import springboot.app.brewery.web.model.BeerStyleEnum;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 
+@Repository
 public interface BeerRepository extends JpaRepository<Beer, UUID> {
     
     Page<Beer> findAllByBeerName(String beerName, Pageable pageable);

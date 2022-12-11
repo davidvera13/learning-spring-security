@@ -16,6 +16,7 @@
  */
 package springboot.app.brewery.repositories;
 
+import org.springframework.stereotype.Repository;
 import springboot.app.brewery.domain.BeerOrder;
 import springboot.app.brewery.domain.Customer;
 import springboot.app.brewery.domain.OrderStatusEnum;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 
+@Repository
 public interface BeerOrderRepository  extends JpaRepository<BeerOrder, UUID> {
 
     Page<BeerOrder> findAllByCustomer(Customer customer, Pageable pageable);

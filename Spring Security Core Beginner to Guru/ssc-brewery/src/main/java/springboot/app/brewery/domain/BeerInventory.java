@@ -27,8 +27,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 
 
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor
 @Entity
 public class BeerInventory extends BaseEntity{

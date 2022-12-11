@@ -16,11 +16,8 @@
  */
 package springboot.app.brewery.domain;
 
+import lombok.*;
 import springboot.app.brewery.web.model.BeerStyleEnum;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -38,7 +35,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor @AllArgsConstructor
 public class Beer extends BaseEntity {
 
     @Builder
