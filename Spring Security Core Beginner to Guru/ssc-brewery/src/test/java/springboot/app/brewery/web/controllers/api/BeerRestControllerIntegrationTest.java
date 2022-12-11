@@ -2,6 +2,7 @@ package springboot.app.brewery.web.controllers.api;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import springboot.app.brewery.web.controllers.BaseIntegrationTest;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -9,15 +10,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-@WebMvcTest
+//@WebMvcTest
+@SpringBootTest
 public class BeerRestControllerIntegrationTest  extends BaseIntegrationTest {
 
     @Test
     void deleteBeer() throws Exception {
         mockMvc.perform(
                     delete("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311")
-                        .header("Api-Key", "admin") // username
-                        .header("Api-Secret", "adminPassword") // password
+                        .header("Api-Key", "john") // username
+                        .header("Api-Secret", "wick") // password
                 )
                 .andExpect(status().isOk());
     }
@@ -25,8 +27,8 @@ public class BeerRestControllerIntegrationTest  extends BaseIntegrationTest {
     void deleteBeerUrl() throws Exception {
         mockMvc.perform(
                         delete("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311")
-                                .param("Api-Key", "admin") // username
-                                .param("Api-Secret", "adminPassword") // password
+                                .param("Api-Key", "john") // username
+                                .param("Api-Secret", "wick") // password
                 )
                 .andExpect(status().isOk());
     }
@@ -53,7 +55,7 @@ public class BeerRestControllerIntegrationTest  extends BaseIntegrationTest {
     @Test
     void deleteBeerHttpBasic() throws Exception{
         mockMvc.perform(delete("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311")
-                        .with(httpBasic("spring", "guru")))
+                        .with(httpBasic("john", "wick")))
                 .andExpect(status().is2xxSuccessful());
     }
 

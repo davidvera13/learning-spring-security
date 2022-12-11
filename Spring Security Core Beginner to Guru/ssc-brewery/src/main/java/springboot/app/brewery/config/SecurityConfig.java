@@ -1,5 +1,6 @@
 package springboot.app.brewery.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,12 +23,20 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import springboot.app.brewery.config.security.PasswordEncoderFactories;
 import springboot.app.brewery.config.security.RestHeaderAuthFilter;
 import springboot.app.brewery.config.security.RestUrlAuthFilter;
+import springboot.app.brewery.services.security.AppUserDetailsService;
 //import org.springframework.security.crypto.password.StandardPasswordEncoder;
 //import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    // private final AppUserDetailsService appUserDetailsService;
+
+    // @Autowired
+    // public SecurityConfig(AppUserDetailsService appUserDetailsService) {
+    //     this.appUserDetailsService = appUserDetailsService;
+    // }
+
     // each filter is set
     private RestHeaderAuthFilter restHeaderAuthFilter(AuthenticationManager authenticationManager) {
         RestHeaderAuthFilter filter = new RestHeaderAuthFilter(new AntPathRequestMatcher("/api/**"));
@@ -65,6 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests(authorize -> {
                     authorize
+                            .antMatchers("/h2-console/**").permitAll() // not to be used in production...
                             .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll()
                             .antMatchers("/beers/find", "/beers*").permitAll()
                             .antMatchers(HttpMethod.GET, "/api/v1/beer/**").permitAll()
@@ -78,29 +88,33 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .formLogin()
                 .and()
                     .httpBasic();
+        // handle h2-console
+        http.headers().frameOptions().sameOrigin();
 
     }
 
     // elegant way to build in memory users
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // super.configure(auth);
-        auth.inMemoryAuthentication()
-                .withUser("admin")
-                // .password("{noop}admin") -> noop tag is no longer required, we created the passwordEncoder bean !
-                .password("{sha256}400cccfce5a3263bfb77d4ee923a37369dcbcacf82289b27fb17aa696094688e395278d2f27b78c9")
-                .roles("ADMIN")
-                .and()
-                .withUser("me")
-                // .password("{noop}me")  -> noop tag is no longer required, we created the passwordEncoder bean !
-                .password("{bcrypt}$2a$10$LU1MPf11TWBVzknQ3hEhe.e9paaYvrgWH3xcuJQOpmTggGKbEkuT.") // USING BCRYPT HERE
-                .roles("USER")
-                .and()
-                .withUser("scott")
-                // .password("{noop}tiger")  -> noop tag is no longer required, we created the passwordEncoder bean !
-                .password("{argon2}$argon2id$v=19$m=4096,t=3,p=1$ElEuOwh4S4EQb46rPQqh8g$y2tVJQZgn/0Z8i4Jq24rs34MxG+0m2KyBPdJl55YtSU") // -> we yse
-                .roles("CUSTOMER");
-    }
+    //@Override
+    // protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        // we can get from database here ..
+        // auth.userDetailsService(this.appUserDetailsService).passwordEncoder(passwordEncoder());
+
+        // auth.inMemoryAuthentication()
+        //         .withUser("admin")
+        //         // .password("{noop}adminPassword") -> noop tag is no longer required, we created the passwordEncoder bean !
+        //         .password("{sha256}400cccfce5a3263bfb77d4ee923a37369dcbcacf82289b27fb17aa696094688e395278d2f27b78c9")
+        //         .roles("ADMIN")
+        //         .and()
+        //         .withUser("me")
+        //         // .password("{noop}me")  -> noop tag is no longer required, we created the passwordEncoder bean !
+        //        .password("{bcrypt}$2a$10$LU1MPf11TWBVzknQ3hEhe.e9paaYvrgWH3xcuJQOpmTggGKbEkuT.") // USING BCRYPT HERE
+        //        .roles("USER")
+        //         .and()
+        //         .withUser("scott")
+        //         // .password("{noop}tiger")  -> noop tag is no longer required, we created the passwordEncoder bean !
+        //        .password("{argon2}$argon2id$v=19$m=4096,t=3,p=1$ElEuOwh4S4EQb46rPQqh8g$y2tVJQZgn/0Z8i4Jq24rs34MxG+0m2KyBPdJl55YtSU") // -> we yse
+        //        .roles("CUSTOMER");
+    // }
 
     // easiest way to build in memory users
     // @Bean
