@@ -7,14 +7,34 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+//import org.springframework.security.core.userdetails.User;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import org.springframework.security.core.userdetails.UserDetailsService;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// replaced by local refactored class
+// import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+//import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
+//import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import springboot.app.brewery.config.security.PasswordEncoderFactories;
+//import org.springframework.security.crypto.password.StandardPasswordEncoder;
+//import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        // NOT RECOMMENDED.... for legacy support only
+        // return NoOpPasswordEncoder.getInstance();
+        // return new LdapShaPasswordEncoder();
+        // return new StandardPasswordEncoder();
+        // return new BCryptPasswordEncoder();
+
+        // allow to delegate password encoding to Springboot
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -42,15 +62,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // super.configure(auth);
         auth.inMemoryAuthentication()
                 .withUser("admin")
-                .password("{noop}admin")
+                // .password("{noop}admin") -> noop tag is no longer required, we created the passwordEncoder bean !
+                .password("{sha256}400cccfce5a3263bfb77d4ee923a37369dcbcacf82289b27fb17aa696094688e395278d2f27b78c9")
                 .roles("ADMIN")
                 .and()
                 .withUser("me")
-                .password("{noop}me")
+                // .password("{noop}me")  -> noop tag is no longer required, we created the passwordEncoder bean !
+                .password("{bcrypt}$2a$10$LU1MPf11TWBVzknQ3hEhe.e9paaYvrgWH3xcuJQOpmTggGKbEkuT.") // USING BCRYPT HERE
                 .roles("USER")
                 .and()
                 .withUser("scott")
-                .password("{noop}tiger")
+                // .password("{noop}tiger")  -> noop tag is no longer required, we created the passwordEncoder bean !
+                .password("{argon2}$argon2id$v=19$m=4096,t=3,p=1$ElEuOwh4S4EQb46rPQqh8g$y2tVJQZgn/0Z8i4Jq24rs34MxG+0m2KyBPdJl55YtSU") // -> we yse
                 .roles("CUSTOMER");
     }
 

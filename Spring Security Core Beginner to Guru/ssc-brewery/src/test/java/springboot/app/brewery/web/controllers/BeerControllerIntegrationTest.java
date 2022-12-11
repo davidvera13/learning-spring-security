@@ -36,6 +36,21 @@ class BeerControllerIntegrationTest extends BaseIntegrationTest {
                 .andExpect(view().name("beers/createBeer"))
                 .andExpect(model().attributeExists("beer"));
     }
+    @Test
+    void initAdminCreationForm() throws Exception {
+        mockMvc.perform(get("/beers/new").with(httpBasic("admin", "adminPassword")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("beers/createBeer"))
+                .andExpect(model().attributeExists("beer"));
+    }
+    @Test
+    void initCustomerCreationForm() throws Exception {
+        mockMvc.perform(get("/beers/new").with(httpBasic("scott", "tiger")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("beers/createBeer"))
+                .andExpect(model().attributeExists("beer"));
+    }
+
 
     @Test
     @WithMockUser("anyUserValue")
@@ -48,15 +63,15 @@ class BeerControllerIntegrationTest extends BaseIntegrationTest {
         verifyNoInteractions(beerRepository);
     }
 
-    @Test
-    // @WithMockUser("root")
-    void findBeersWithHttpBasic() throws Exception {
-        // fake a call to controller
-        mockMvc.perform(
-                    get("/beers/find").with(httpBasic("root", "root")))
-                .andExpect(status().isOk())
-                .andExpect(view().name("beers/findBeers"))
-                .andExpect(model().attributeExists("beer"));
-        verifyNoInteractions(beerRepository);
-    }
+//    @Test
+//    // @WithMockUser("root")
+//    void findBeersWithHttpBasic() throws Exception {
+//        // fake a call to controller
+//        mockMvc.perform(
+//                    get("/beers/find").with(httpBasic("root", "root")))
+//                .andExpect(status().isOk())
+//                .andExpect(view().name("beers/findBeers"))
+//                .andExpect(model().attributeExists("beer"));
+//        verifyNoInteractions(beerRepository);
+//    }
 }
