@@ -28,33 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest
 class BeerControllerIntegrationTest extends BaseIntegrationTest {
-//    @Autowired
-//    WebApplicationContext wac;
-//
-//    MockMvc mockMvc;
-//
-//    @MockBean
-//    BeerRepository beerRepository;
-//
-//    @MockBean
-//    BeerInventoryRepository beerInventoryRepository;
-//
-//    @MockBean
-//    BreweryService breweryService;
-//
-//    @MockBean
-//    CustomerRepository customerRepository;
-//
-//    @MockBean
-//    BeerService beerService;
-//
-//    @BeforeEach
-//    void setUp() {
-//        mockMvc = MockMvcBuilders
-//                .webAppContextSetup(wac)
-//                .apply(springSecurity())
-//                .build();
-//    }
+
+    @Test
+    void initCreationForm() throws Exception {
+        mockMvc.perform(get("/beers/new").with(httpBasic("me", "me")))
+                .andExpect(status().isOk())
+                .andExpect(view().name("beers/createBeer"))
+                .andExpect(model().attributeExists("beer"));
+    }
 
     @Test
     @WithMockUser("anyUserValue")
