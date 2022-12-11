@@ -17,74 +17,44 @@
 
 package springboot.app.brewery.web.controllers;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import springboot.app.brewery.domain.Beer;
-import springboot.app.brewery.repositories.BeerInventoryRepository;
-import springboot.app.brewery.repositories.BeerRepository;
-import springboot.app.brewery.repositories.CustomerRepository;
-import springboot.app.brewery.services.BeerService;
-import springboot.app.brewery.services.BreweryService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest
-class BeerControllerItTest {
-    @Autowired
-    WebApplicationContext wac;
-
-    MockMvc mockMvc;
-
-    @MockBean
-    BeerRepository beerRepository;
-
-    @MockBean
-    BeerInventoryRepository beerInventoryRepository;
-
-    @MockBean
-    BreweryService breweryService;
-
-    @MockBean
-    CustomerRepository customerRepository;
-
-    @MockBean
-    BeerService beerService;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(springSecurity())
-                .build();
-    }
+class BeerControllerIntegrationTest extends BaseIntegrationTest {
+//    @Autowired
+//    WebApplicationContext wac;
+//
+//    MockMvc mockMvc;
+//
+//    @MockBean
+//    BeerRepository beerRepository;
+//
+//    @MockBean
+//    BeerInventoryRepository beerInventoryRepository;
+//
+//    @MockBean
+//    BreweryService breweryService;
+//
+//    @MockBean
+//    CustomerRepository customerRepository;
+//
+//    @MockBean
+//    BeerService beerService;
+//
+//    @BeforeEach
+//    void setUp() {
+//        mockMvc = MockMvcBuilders
+//                .webAppContextSetup(wac)
+//                .apply(springSecurity())
+//                .build();
+//    }
 
     @Test
     @WithMockUser("anyUserValue")
