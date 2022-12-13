@@ -17,6 +17,7 @@
 
 package springboot.app.brewery.web.controllers.api;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import springboot.app.brewery.services.BeerService;
 import springboot.app.brewery.web.model.BeerDto;
 import springboot.app.brewery.web.model.BeerPagedList;
@@ -43,7 +44,6 @@ public class BeerRestController {
 
     private static final Integer DEFAULT_PAGE_NUMBER = 0;
     private static final Integer DEFAULT_PAGE_SIZE = 25;
-
     private final BeerService beerService;
 
     @GetMapping(produces = { "application/json" }, path = "beer")
@@ -111,6 +111,7 @@ public class BeerRestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping({"beer/{beerId}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBeer(@PathVariable("beerId") UUID beerId){
