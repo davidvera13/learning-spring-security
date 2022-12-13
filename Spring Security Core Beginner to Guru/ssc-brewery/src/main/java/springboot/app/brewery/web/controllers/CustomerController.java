@@ -17,6 +17,8 @@
 
 package springboot.app.brewery.web.controllers;
 
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import springboot.app.brewery.domain.Customer;
 import springboot.app.brewery.repositories.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +49,9 @@ public class CustomerController {
         return "customers/findCustomers";
     }
 
+
+    // @Secured({"ROLE_ADMIN", "ROLE_CUSTOMER"})
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
     @GetMapping
     public String processFindFormReturnMany(Customer customer, BindingResult result, Model model){
         // find customers by name
@@ -75,6 +80,7 @@ public class CustomerController {
         return mav;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/new")
     public String initCreationForm(Model model) {
         model.addAttribute("customer", Customer.builder().build());

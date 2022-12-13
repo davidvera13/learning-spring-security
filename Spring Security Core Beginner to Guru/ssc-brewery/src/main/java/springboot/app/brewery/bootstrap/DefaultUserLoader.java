@@ -44,19 +44,23 @@ public class DefaultUserLoader implements CommandLineRunner {
 
     private void loadUserData() {
         // creating authorities
-        GrantedAuthorityEntity admin = authorityRepository.save(GrantedAuthorityEntity.builder().role("ADMIN").build());
-        GrantedAuthorityEntity userRole = authorityRepository.save(GrantedAuthorityEntity.builder().role("USER").build());
-        GrantedAuthorityEntity customer = authorityRepository.save(GrantedAuthorityEntity.builder().role("CUSTOMER").build());
+        GrantedAuthorityEntity admin = authorityRepository.save(GrantedAuthorityEntity.builder().role("ROLE_ADMIN").build());
+        GrantedAuthorityEntity userRole = authorityRepository.save(GrantedAuthorityEntity.builder().role("ROLE_USER").build());
+        GrantedAuthorityEntity customer = authorityRepository.save(GrantedAuthorityEntity.builder().role("ROLE_CUSTOMER").build());
 
+//        tream.of(Arguments.of("spring" , "boot"),
+//                Arguments.of("scott", "tiger"),
+//                Arguments.of("user", "password"));
+//
         userRepository.save(UserEntity.builder()
-                .username("john")
-                .password(passwordEncoder.encode("wick"))
+                .username("spring")
+                .password(passwordEncoder.encode("boot"))
                 .authority(admin)
                 .build());
 
         userRepository.save(UserEntity.builder()
-                .username("fox")
-                .password(passwordEncoder.encode("mulder"))
+                .username("user")
+                .password(passwordEncoder.encode("password"))
                 .authority(userRole)
                 .build());
 
