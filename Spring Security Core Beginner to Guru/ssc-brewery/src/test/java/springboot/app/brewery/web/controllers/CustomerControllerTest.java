@@ -93,7 +93,7 @@ class CustomerControllerTest extends BaseIntegrationTest {
             mockMvc.perform(post("/customers/new")
                             .param("customerName", "Foo Customer2")
                             .with(httpBasic(user, pwd)))
-                    .andExpect(status().is(302));
+                    .andExpect(status().isForbidden());
         }
 
         @Test

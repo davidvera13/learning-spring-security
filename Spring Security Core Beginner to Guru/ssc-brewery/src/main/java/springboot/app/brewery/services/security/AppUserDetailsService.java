@@ -49,7 +49,7 @@ public class AppUserDetailsService implements UserDetailsService {
     private Collection<? extends GrantedAuthority> getAuthorities(Set<GrantedAuthorityEntity> authorities) {
         if( authorities != null && authorities.size() > 0) {
             return authorities.stream()
-                    .map(GrantedAuthorityEntity::getRole)
+                    .map(GrantedAuthorityEntity::getPermission)
                     .map(SimpleGrantedAuthority::new)
                     .collect(Collectors.toSet());
         }

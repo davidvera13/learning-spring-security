@@ -17,6 +17,8 @@
 
 package springboot.app.brewery.web.controllers;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import springboot.app.brewery.config.annotations.brewery.BreweryReadPermission;
 import springboot.app.brewery.domain.Brewery;
 import springboot.app.brewery.services.BreweryService;
 import lombok.RequiredArgsConstructor;
@@ -36,11 +38,16 @@ public class BreweryController {
 
     private final BreweryService breweryService;
 
+    // @PreAuthorize("hasAuthority('brewery.read')")
+    @BreweryReadPermission
     @GetMapping({"/breweries", "/breweries/index", "/breweries/index.html", "/breweries.html"})
     public String listBreweries(Model model) {
         model.addAttribute("breweries", breweryService.getAllBreweries());
         return "breweries/index";
     }
+
+    // @PreAuthorize("hasAuthority('brewery.read')")
+    @BreweryReadPermission
     @GetMapping("/api/v1/breweries")
     public @ResponseBody
     List<Brewery> getBreweriesJson(){

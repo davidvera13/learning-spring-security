@@ -17,7 +17,10 @@
 
 package springboot.app.brewery.web.controllers.api;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+import springboot.app.brewery.config.annotations.beers.BeerCreatePermission;
+import springboot.app.brewery.config.annotations.beers.BeerDeletePermission;
+import springboot.app.brewery.config.annotations.beers.BeerReadPermission;
+import springboot.app.brewery.config.annotations.beers.BeerUpdatePermission;
 import springboot.app.brewery.services.BeerService;
 import springboot.app.brewery.web.model.BeerDto;
 import springboot.app.brewery.web.model.BeerPagedList;
@@ -46,6 +49,9 @@ public class BeerRestController {
     private static final Integer DEFAULT_PAGE_SIZE = 25;
     private final BeerService beerService;
 
+    // customized @PreAuthorize annotation
+    // @PreAuthorize("hasAuthority('beer.read')")
+    @BeerReadPermission
     @GetMapping(produces = { "application/json" }, path = "beer")
     public ResponseEntity<BeerPagedList> listBeers(@RequestParam(value = "pageNumber", required = false) Integer pageNumber,
                                                    @RequestParam(value = "pageSize", required = false) Integer pageSize,
@@ -72,6 +78,8 @@ public class BeerRestController {
         return new ResponseEntity<>(beerList, HttpStatus.OK);
     }
 
+    // @PreAuthorize("hasAuthority('beer.read')")
+    @BeerReadPermission
     @GetMapping(path = {"beer/{beerId}"}, produces = { "application/json" })
     public ResponseEntity<BeerDto> getBeerById(@PathVariable("beerId") UUID beerId,
                                                @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
@@ -85,11 +93,15 @@ public class BeerRestController {
         return new ResponseEntity<>(beerService.findBeerById(beerId, showInventoryOnHand), HttpStatus.OK);
     }
 
+    // @PreAuthorize("hasAuthority('beer.read')")
+    @BeerReadPermission
     @GetMapping(path = {"beerUpc/{upc}"}, produces = { "application/json" })
     public ResponseEntity<BeerDto> getBeerByUpc(@PathVariable("upc") String upc){
         return new ResponseEntity<>(beerService.findBeerByUpc(upc), HttpStatus.OK);
     }
 
+    // @PreAuthorize("hasAuthority('beer.create')")
+    @BeerCreatePermission
     @PostMapping(path = "beer")
     public ResponseEntity saveNewBeer(@Valid @RequestBody BeerDto beerDto){
 
@@ -103,6 +115,8 @@ public class BeerRestController {
         return new ResponseEntity(httpHeaders, HttpStatus.CREATED);
     }
 
+    // @PreAuthorize("hasAuthority('beer.update')")
+    @BeerUpdatePermission
     @PutMapping(path = {"beer/{beerId}"}, produces = { "application/json" })
     public ResponseEntity updateBeer(@PathVariable("beerId") UUID beerId, @Valid @RequestBody BeerDto beerDto){
 
@@ -111,7 +125,9 @@ public class BeerRestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasAuthority('beer.delete')")
+    @BeerDeletePermission
     @DeleteMapping({"beer/{beerId}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBeer(@PathVariable("beerId") UUID beerId){
@@ -120,7 +136,7 @@ public class BeerRestController {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ResponseEntity<List> badReqeustHandler(ConstraintViolationException e){
+    ResponseEntity<List> badRequestHandler(ConstraintViolationException e){
         List<String> errors = new ArrayList<>(e.getConstraintViolations().size());
 
         e.getConstraintViolations().forEach(constraintViolation -> {
