@@ -16,6 +16,7 @@
  */
 package springboot.app.brewery.repositories;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import springboot.app.brewery.domain.BeerOrder;
 import springboot.app.brewery.domain.Customer;
@@ -39,4 +40,8 @@ public interface BeerOrderRepository  extends JpaRepository<BeerOrder, UUID> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     BeerOrder findOneById(UUID id);
+
+    @Query("select o from BeerOrder o where o.id =?1 and " +
+            "(true = :#{hasAuthority('order.read')} or o.customer.id = ?#{principal?.customer?.id})")
+    BeerOrder findOrderByIdSecure(UUID orderId);
 }

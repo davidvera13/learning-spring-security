@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 //import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 //import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import springboot.app.brewery.config.security.PasswordEncoderFactories;
@@ -32,24 +33,24 @@ import springboot.app.brewery.services.security.AppUserDetailsService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    // private final AppUserDetailsService appUserDetailsService;
 
-    // @Autowired
-    // public SecurityConfig(AppUserDetailsService appUserDetailsService) {
-    //     this.appUserDetailsService = appUserDetailsService;
-    // }
+    // this bean is require for Spring Data JPA SPel
+    @Bean
+    public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
+        return new SecurityEvaluationContextExtension();
+    }
 
     // each filter is set
-    private RestHeaderAuthFilter restHeaderAuthFilter(AuthenticationManager authenticationManager) {
-        RestHeaderAuthFilter filter = new RestHeaderAuthFilter(new AntPathRequestMatcher("/api/**"));
-        filter.setAuthenticationManager(authenticationManager);
-        return filter;
-    }
-    private RestUrlAuthFilter restUrlAuthFilter(AuthenticationManager authenticationManager) {
-        RestUrlAuthFilter filter = new RestUrlAuthFilter(new AntPathRequestMatcher("/api/**"));
-        filter.setAuthenticationManager(authenticationManager);
-        return filter;
-    }
+    // private RestHeaderAuthFilter restHeaderAuthFilter(AuthenticationManager authenticationManager) {
+    //     RestHeaderAuthFilter filter = new RestHeaderAuthFilter(new AntPathRequestMatcher("/api/**"));
+    //     filter.setAuthenticationManager(authenticationManager);
+    //     return filter;
+    // }
+    // private RestUrlAuthFilter restUrlAuthFilter(AuthenticationManager authenticationManager) {
+    //     RestUrlAuthFilter filter = new RestUrlAuthFilter(new AntPathRequestMatcher("/api/**"));
+    //     filter.setAuthenticationManager(authenticationManager);
+    //    return filter;
+    // }
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -65,14 +66,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
-                .addFilterBefore(
-                        restHeaderAuthFilter(authenticationManager()),
-                        UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(
-                        restUrlAuthFilter(authenticationManager()),
-                        UsernamePasswordAuthenticationFilter.class);
+        //http
+                // .csrf().disable()
+                // .addFilterBefore(
+                //        restHeaderAuthFilter(authenticationManager()),
+                //        UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(
+                //        restUrlAuthFilter(authenticationManager()),
+                //        UsernamePasswordAuthenticationFilter.class);
         http
                 .authorizeRequests(authorize -> {
                     authorize
@@ -100,7 +101,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .formLogin()
                 .and()
-                    .httpBasic();
+                    .httpBasic()
+                .and()
+                    .csrf().disable();
         // handle h2-console
         http.headers().frameOptions().sameOrigin();
 

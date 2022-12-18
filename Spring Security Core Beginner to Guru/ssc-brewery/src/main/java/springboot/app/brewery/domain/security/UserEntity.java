@@ -1,6 +1,11 @@
 package springboot.app.brewery.domain.security;
 
 import lombok.*;
+import org.springframework.security.core.CredentialsContainer;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import springboot.app.brewery.domain.Customer;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -11,7 +16,8 @@ import java.util.stream.Collectors;
 @Table(name = "users")
 @Getter @Setter
 @AllArgsConstructor @NoArgsConstructor
-public class UserEntity {
+// we implement a custom userdetail
+public class UserEntity implements UserDetails, CredentialsContainer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,15 +25,6 @@ public class UserEntity {
     // other properties can be added ...
     private String password;
     private String username;
-
-//    @Singular
-//    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-//    @JoinTable(
-//            name = "user_authority",
-//            joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id")},
-//            inverseJoinColumns = { @JoinColumn(name="authority_id", referencedColumnName = "id")}
-//    )
-//    private Set<GrantedAuthorityEntity> authorities;
 
     @Singular
     @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
@@ -37,6 +34,9 @@ public class UserEntity {
             inverseJoinColumns = { @JoinColumn(name="role_id", referencedColumnName = "id")}
     )
     private Set<RoleEntity> roles;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Customer customer;
 
     // tell hibernate that this property is "calculated" and is not a property it the Users table.
     // It is evaluated based on user relation to role and role relation to authorities.
@@ -53,10 +53,37 @@ public class UserEntity {
     private Boolean enabled = true;
 
     // helper method
-    public Set<GrantedAuthorityEntity> getAuthorities() {
+    @Transient
+    public Set<GrantedAuthority> getAuthorities() {
         return this.roles.stream()
                 .map(RoleEntity::getAuthorities)
                 .flatMap(Set::stream)
+                .map(authority -> new SimpleGrantedAuthority(authority.getPermission()))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return this.credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @Override
+    public void eraseCredentials() {
+        this.password = null;
     }
 }

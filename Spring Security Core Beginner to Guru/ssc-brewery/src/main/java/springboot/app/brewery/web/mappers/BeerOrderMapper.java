@@ -17,9 +17,14 @@
 
 package springboot.app.brewery.web.mappers;
 
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import springboot.app.brewery.domain.BeerOrder;
 import springboot.app.brewery.web.model.BeerOrderDto;
 import org.mapstruct.Mapper;
+
+import javax.persistence.LockModeType;
+import java.util.UUID;
 
 @Mapper(uses = {DateMapper.class, BeerOrderLineMapper.class})
 public interface BeerOrderMapper {

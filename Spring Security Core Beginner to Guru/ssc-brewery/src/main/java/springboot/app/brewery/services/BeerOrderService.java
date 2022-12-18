@@ -18,6 +18,7 @@
 package springboot.app.brewery.services;
 
 
+import org.springframework.data.domain.PageRequest;
 import springboot.app.brewery.web.model.BeerOrderDto;
 import springboot.app.brewery.web.model.BeerOrderPagedList;
 import org.springframework.data.domain.Pageable;
@@ -32,4 +33,10 @@ public interface BeerOrderService {
     BeerOrderDto getOrderById(UUID customerId, UUID orderId);
 
     void pickupOrder(UUID customerId, UUID orderId);
+
+    BeerOrderPagedList listOrders(Pageable pageable);
+
+    BeerOrderDto getOrderById(UUID orderId);
+
+
 }

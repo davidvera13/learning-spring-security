@@ -29,30 +29,35 @@ public class AppUserDetailsService implements UserDetailsService {
     // could not initialize proxy - no Session
     // solution 1: adding transactional to the loadUserByUsername method
     // solution 2: make use fetch authorization eager
-    // @Transactional
+     @Transactional
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.debug("Getting user info via JPA");
-        UserEntity userEntity = userRepository
-                .findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User " + username + "not found"));
-        return new User(
-                userEntity.getUsername(),
-                userEntity.getPassword(),
-                userEntity.getEnabled(),
-                userEntity.getAccountNonExpired(),
-                userEntity.getCredentialsNonExpired(),
-                userEntity.getAccountNonLocked(),
-                getAuthorities(userEntity.getAuthorities()));
+
+        // we do not need to create a User from spring security core,
+         // UserEntity implements UserDetails and CredentialContainer => no type conversion required
+         // UserEntity userEntity = userRepository...
+         return userRepository
+                 .findByUsername(username)
+                 .orElseThrow(() -> new UsernameNotFoundException("User " + username + "not found"));
+        // return new User(
+        //        userEntity.getUsername(),
+        //        userEntity.getPassword(),
+        //        userEntity.getEnabled(),
+        //        userEntity.getAccountNonExpired(),
+        //        userEntity.getCredentialsNonExpired(),
+        //        userEntity.getAccountNonLocked(),
+        //        getAuthorities(userEntity.getAuthorities()));
     }
 
-    private Collection<? extends GrantedAuthority> getAuthorities(Set<GrantedAuthorityEntity> authorities) {
-        if( authorities != null && authorities.size() > 0) {
-            return authorities.stream()
-                    .map(GrantedAuthorityEntity::getPermission)
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toSet());
-        }
-        return new HashSet<>();
-    }
+    // this is not required anymore
+    // private Collection<? extends GrantedAuthority> getAuthorities(Set<GrantedAuthorityEntity> authorities) {
+    //     if( authorities != null && authorities.size() > 0) {
+    //        return authorities.stream()
+    //                 .map(GrantedAuthorityEntity::getPermission)
+    //                .map(SimpleGrantedAuthority::new)
+    //                .collect(Collectors.toSet());
+    //    }
+    //     return new HashSet<>();
+    // }
 }
