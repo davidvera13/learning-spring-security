@@ -3,9 +3,6 @@ package springboot.app.brewery.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,14 +15,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 // import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 //import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 //import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import springboot.app.brewery.config.security.PasswordEncoderFactories;
-import springboot.app.brewery.config.security.RestHeaderAuthFilter;
-import springboot.app.brewery.config.security.RestUrlAuthFilter;
-import springboot.app.brewery.services.security.AppUserDetailsService;
 //import org.springframework.security.crypto.password.StandardPasswordEncoder;
 //import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
@@ -33,6 +28,17 @@ import springboot.app.brewery.services.security.AppUserDetailsService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final UserDetailsService userDetailsService;
+    private final PersistentTokenRepository persistentTokenRepository;
+
+
+    @Autowired
+    public SecurityConfig(UserDetailsService userDetailsService, PersistentTokenRepository persistentTokenRepository) {
+        this.userDetailsService = userDetailsService;
+        this.persistentTokenRepository = persistentTokenRepository;
+    }
+
 
     // this bean is require for Spring Data JPA SPel
     @Bean
@@ -117,7 +123,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpBasic()
                 .and()
                     //.csrf().disable();
-                    .csrf().ignoringAntMatchers("/h2-console/**", "/api/**");
+                    .csrf().ignoringAntMatchers("/h2-console/**", "/api/**")
+                .and()
+                    .rememberMe()
+                    // .key("remember-me-key") // using simple hash based token remember me
+                    .tokenRepository(persistentTokenRepository)
+                    .userDetailsService(userDetailsService);;
 
         // handle h2-console
         http.headers().frameOptions().sameOrigin();
