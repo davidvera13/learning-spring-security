@@ -103,7 +103,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .httpBasic()
                 .and()
-                    .csrf().disable();
+                    //.csrf().disable();
+                    .csrf().ignoringAntMatchers("/h2-console/**", "/api/**");
+
         // handle h2-console
         http.headers().frameOptions().sameOrigin();
 

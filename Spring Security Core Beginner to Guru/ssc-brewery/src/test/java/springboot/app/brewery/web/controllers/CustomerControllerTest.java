@@ -39,6 +39,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -81,6 +82,7 @@ class CustomerControllerTest extends BaseIntegrationTest {
         @Test
         void processCreationForm() throws Exception{
             mockMvc.perform(post("/customers/new")
+                            .with(csrf())
                             .param("customerName", "Foo Customer")
                             .with(httpBasic("spring", "boot")))
                     .andExpect(status().is3xxRedirection());
@@ -99,6 +101,7 @@ class CustomerControllerTest extends BaseIntegrationTest {
         @Test
         void processCreationFormNOAUTH() throws Exception{
             mockMvc.perform(post("/customers/new")
+                            .with(csrf())
                             .param("customerName", "Foo Customer"))
                     .andExpect(status().isUnauthorized());
         }
