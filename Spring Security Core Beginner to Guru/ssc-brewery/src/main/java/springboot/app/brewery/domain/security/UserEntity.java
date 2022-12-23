@@ -55,6 +55,14 @@ public class UserEntity implements UserDetails, CredentialsContainer {
     @Builder.Default
     private Boolean enabled = true;
 
+    @Builder.Default
+    private Boolean useGoogle2fa = false;
+
+    private String google2FaSecret;
+
+    @Transient
+    private Boolean google2faRequired = true;
+
     // helper method
     @Transient
     public Set<GrantedAuthority> getAuthorities() {

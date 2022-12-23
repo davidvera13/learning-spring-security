@@ -19,7 +19,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import springboot.app.brewery.config.security.Google2faFilter;
 import springboot.app.brewery.config.security.PasswordEncoderFactories;
 //import org.springframework.security.crypto.password.StandardPasswordEncoder;
 //import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -31,12 +33,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
     private final PersistentTokenRepository persistentTokenRepository;
+    private final Google2faFilter google2faFilter;
+
 
 
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService, PersistentTokenRepository persistentTokenRepository) {
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          PersistentTokenRepository persistentTokenRepository,
+                          Google2faFilter google2faFilter) {
         this.userDetailsService = userDetailsService;
         this.persistentTokenRepository = persistentTokenRepository;
+        this.google2faFilter = google2faFilter;
     }
 
 
@@ -80,6 +87,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 //.addFilterBefore(
                 //        restUrlAuthFilter(authenticationManager()),
                 //        UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(google2faFilter, SessionManagementFilter.class);
+
         http
                 .authorizeRequests(authorize -> {
                     authorize
