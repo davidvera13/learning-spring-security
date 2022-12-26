@@ -65,17 +65,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     //    return filter;
     // }
 
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        // NOT RECOMMENDED.... for legacy support only
-        // return NoOpPasswordEncoder.getInstance();
-        // return new LdapShaPasswordEncoder();
-        // return new StandardPasswordEncoder();
-        // return new BCryptPasswordEncoder();
-
-        // allow to delegate password encoding to Springboot
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+//    @Bean
+//    PasswordEncoder passwordEncoder() {
+//        // NOT RECOMMENDED.... for legacy support only
+//        // return NoOpPasswordEncoder.getInstance();
+//        // return new LdapShaPasswordEncoder();
+//        // return new StandardPasswordEncoder();
+//        // return new BCryptPasswordEncoder();
+//
+//        // allow to delegate password encoding to Springboot
+//        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -90,6 +90,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(google2faFilter, SessionManagementFilter.class);
 
         http
+                .cors().and()
                 .authorizeRequests(authorize -> {
                     authorize
                             .antMatchers("/h2-console/**")

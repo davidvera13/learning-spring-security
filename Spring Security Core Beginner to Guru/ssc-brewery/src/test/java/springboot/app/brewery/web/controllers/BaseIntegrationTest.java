@@ -42,6 +42,7 @@ public abstract class BaseIntegrationTest {
     public void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
+                // this apply spring security to tests
                 .apply(springSecurity())
                 .build();
     }
