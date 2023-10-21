@@ -75,3 +75,61 @@ the form login and httpBasic and build can be added to the first line:
                 .build();
     }
 
+### Step 2: managing users
+At this stage, only one user can access the application.
+
+    spring.security.user.name=root
+    spring.security.user.password=root
+
+We can configure multiple users and store credentials in application memory or into database and give more flexibility. 
+
+First approach allow to manage users using in memory storage: 
+Two solutions for this approach : 
+
+    @Bean
+    InMemoryUserDetailsManager userDetailsService() {
+        UserDetails admin = User.withDefaultPasswordEncoder()
+                .username("admin")
+               .password("12345")
+               .authorities("admin")
+               .build();
+    
+      UserDetails user = User.withDefaultPasswordEncoder()
+             .username("user")
+             .password("12345")
+             .authorities("read")
+             .build();
+     return new InMemoryUserDetailsManager(admin, user);
+    }
+
+or: 
+
+     @Bean
+     InMemoryUserDetailsManager userDetailsService() {
+         InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
+
+         UserDetails admin = User.withUsername("admin")
+                .password("12345")
+                .authorities("admin")
+                .build();
+
+         UserDetails user = User.withUsername("user")
+                 .password("12345")
+                 .authorities("read")
+                 .build();
+         inMemoryUserDetailsManager.createUser(admin);
+         inMemoryUserDetailsManager.createUser(user);
+      return inMemoryUserDetailsManager;
+     }
+
+     @Bean
+    PasswordEncoder passwordEncoder() {
+         return NoOpPasswordEncoder.getInstance();
+     }
+
+Note: those 2 approaches should not be used for production, just for test purpose.
+- UserDetails - service is the core interface which loads user specific data 
+- UserDetailsManager - extends the UserDetailsService and allow user creation and update
+- InMemoryUserDetailsManager is an implementation of the Managern as well as JdbcUserDetailsManager
+  or LdapUsersDetailsManager
+
