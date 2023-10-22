@@ -24,18 +24,18 @@ public class UserServiceImpl implements UserService {
         this.modelMapper = new ModelMapper();
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        List<CustomerEntity> customerEntities = repository.findByEmail(username);
-        if(customerEntities.isEmpty())  // size() = 0
-            throw new UsernameNotFoundException("User details not found for the user: " + username);
-
-        return new User(
-                customerEntities.get(0).getEmail(),
-                customerEntities.get(0).getPwd(),
-                // shorter than creating a list of GrantedAuthority and add SimpleGrantAuthority
-                List.of(new SimpleGrantedAuthority(customerEntities.get(0).getRole())));
-    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        List<CustomerEntity> customerEntities = repository.findByEmail(username);
+//        if(customerEntities.isEmpty())  // size() = 0
+//            throw new UsernameNotFoundException("User details not found for the user: " + username);
+//
+//        return new User(
+//                customerEntities.get(0).getEmail(),
+//                customerEntities.get(0).getPwd(),
+//                // shorter than creating a list of GrantedAuthority and add SimpleGrantAuthority
+//                List.of(new SimpleGrantedAuthority(customerEntities.get(0).getRole())));
+//    }
 
     @Override
     public CustomerDto createUser(CustomerDto customerDto) {

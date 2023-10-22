@@ -25,7 +25,7 @@ This class is in  the org.springframework.boot:spring-boot-autoconfigure:3.1.4 d
      	 return http.build();
      }
 
-### Step 1: Configuring the security filter chain
+### Step 1a: Configuring the security filter chain
 We can create a more custom security filter chain in a configuration class. 
 1. Copy the method from SpringBootWebSecurityConfiguration
 2. Create a AppSecurityConfig class annotated as configuration 
@@ -49,7 +49,7 @@ In debut mode, the defaultSecurityFilter chain is called.
 ![img.png](img.png)
 
 
-### Step 1: Customizing the security filter chain with secured and unsecured routes
+### Step 1b: Customizing the security filter chain with secured and unsecured routes
 We pass request matcher that are string patterns for routes requiring authentication and routes that are 
 permitted to all users.
 
@@ -186,3 +186,13 @@ Several password encoders implementations are available:
     attacker and defender.
 
 BCryptPasswordEncoder is the most recommended encoder for passwords. Argon2 do consumes more memory.  
+
+
+### Step 4: custom authentication logic 
+ 
+We may want to implement a custom authentication provider. We can also have several authentication provider using 
+password & login, using OAUth, using OTP also...
+
+Interface AuthenticationProvider provides 2 abstract methods: 
+- authenticate
+- supports (boolean): we inform spring security that the authentication provider is supporter
