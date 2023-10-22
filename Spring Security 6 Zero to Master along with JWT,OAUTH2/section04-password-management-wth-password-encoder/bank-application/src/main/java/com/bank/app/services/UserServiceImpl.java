@@ -1,7 +1,7 @@
 package com.bank.app.services;
 
-import com.bank.app.config.io.entity.CustomerEntity;
-import com.bank.app.config.io.reposioty.CustomerRepository;
+import com.bank.app.io.entity.CustomerEntity;
+import com.bank.app.io.repository.CustomerRepository;
 import com.bank.app.shared.dto.CustomerDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
     private final CustomerRepository repository;
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     @Autowired
     public UserServiceImpl(CustomerRepository repository) {

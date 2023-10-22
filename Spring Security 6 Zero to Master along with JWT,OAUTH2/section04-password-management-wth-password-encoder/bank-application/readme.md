@@ -133,3 +133,56 @@ Note: those 2 approaches should not be used for production, just for test purpos
 - InMemoryUserDetailsManager is an implementation of the Managern as well as JdbcUserDetailsManager
   or LdapUsersDetailsManager
 
+
+### Step 3: managing password with PasswordEncoder
+
+Storing passwords with plain text in a storage like database may cause integrity and confidentiality issues. 
+- DB can be accessed by DB Admins and could get credentials.
+- Hackers could access to database too
+
+3 options are available for password management
+- encoding: 
+  - defined as the process of converting data from one form to another and has nothing to do with cryptography
+  - it envolves no secret and completely reversible
+  - encoding can't be used for securing data
+  - Some encodind algorithms: ASCII, base64, unicode
+- encryption:
+  - defined as the process of transforming data in such a way that guarantees confidentiality
+  - to achieve confidentiality, encryption requires the use of a secret which in cryptographic terms is called a key
+  - encryption can be reversible by using decryption with the help of the key. As long as the key is confidential, 
+    encryption can be considered as secured
+- hashing:
+  - in hashing, data is converted to the hash value using hashing function
+  - data once hashed is non-reversible. One cannot determine the original data from a hash value generated
+  - given some arbitrary data along with the output, one can verify whether data matches the original input data without
+    needing to see the original data
+
+PasswordEncoder has 3 methods:
+- endcode
+- matches
+- updagradeEncoding
+
+Several password encoders implementations are available:
+- **NoOpPasswordEndoder (not recommended)**
+- **StandardPasswordEncoder (not recommended)**
+- **Pbkdf2PasswordEncoder**: The algorithm is invoked on the concatenated bytes of the salt, secret and password (not really recommended).
+  - a configurable random salt value length (default is 16 bytes)
+  - a configurable number of iterations (default is 310000) 
+  - a configurable key derivation function (see Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm)
+  - a configurable secret appended to the random salt (default is empty)
+- **BCryptPasswordEncoder**:  Implementation of PasswordEncoder that uses the BCrypt strong hashing function. Clients 
+    can optionally supply a "version" ($2a, $2b, $2y) and a "strength" (a.k.a. log rounds in BCrypt) and a SecureRandom 
+    instance. The larger the strength parameter the more work will have to be done (exponentially) to hash the 
+    passwords. The default value is 10.
+- **SCryptPasswordEncoder**: Implementation of PasswordEncoder that uses the SCrypt hashing function. Clients can 
+    optionally supply a cpu cost parameter, a memory cost parameter and a parallelization parameter. The currently 
+    implementation uses Bouncy castle which does not exploit parallelism/optimizations that password crackers will, so 
+    there is an unnecessary asymmetry between attacker and defender. Scrypt is based on Salsa20 which performs poorly in 
+    Java (on par with AES) but performs awesome (~4-5x faster) on SIMD capable platforms.
+- **Argon2PasswordEncoder**: Implementation of PasswordEncoder that uses the Argon2 hashing function. Clients can  
+    optionally supply the length of the salt to use, the length of the generated hash, a cpu cost parameter, a memory 
+    cost parameter and a parallelization parameter. Note: The currently implementation uses Bouncy castle which does 
+    not exploit parallelism/optimizations that password crackers will, so there is an unnecessary  asymmetry between 
+    attacker and defender.
+
+BCryptPasswordEncoder is the most recommended encoder for passwords. Argon2 do consumes more memory.  

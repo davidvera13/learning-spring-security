@@ -1,6 +1,6 @@
-package com.bank.app.config.io.reposioty;
+package com.bank.app.io.repository;
 
-import com.bank.app.config.io.entity.CustomerEntity;
+import com.bank.app.io.entity.CustomerEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
