@@ -57,8 +57,24 @@ public class AppSecurityConfig {
 
                 //return http.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/contact", "/auth/users").authenticated()
-                .requestMatchers("/notices", "/auth/register").permitAll())
+                        // we can give roles (group of authorities):
+                        // ROLE_USER should not start with ROLE_ since ROLE_ is automatically prepended when using hasRole...
+                        .requestMatchers("/myAccount").hasRole("USER")
+                        .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/myLoans").hasRole("USER")
+                        .requestMatchers("/myCards").hasRole("USER")
+                        // we can give specific authorizations on earch entry point
+                        // actually, we don't have a complex requirement
+                        //.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+                        //.requestMatchers("/myBalance").hasAnyAuthority("VIEWACCOUNT", "VIEWBALANCE")
+                        //.requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+                        //.requestMatchers("/myCards").hasAuthority("VIEWCARDS")
+                        // returns a 403 error as we don't provide this authority to user...
+                        //.requestMatchers("/myCards").hasAuthority("VIEWCARDSDETAILS")
+                        //.requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/contact", "/auth/users").authenticated()
+                        // for remaining routes, we don't care about authority, we consider only users are authenticated
+                        .requestMatchers( "/contact", "/auth/users").authenticated()
+                        .requestMatchers("/notices", "/auth/register").permitAll())
                 .formLogin(withDefaults())
                 .httpBasic(withDefaults())
                 .build();

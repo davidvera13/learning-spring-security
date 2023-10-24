@@ -368,3 +368,70 @@ Note that we have in AuthenticationController the following method that handles 
 The authentication is managed in defaultSecurityFilterChain: 
 
       .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/auth/users").authenticated()
+
+### Step 7: managing authorizations
+
+Authentication : 
+- in authentication the identity of users are checked for providing access to the system
+- authentication is done before authorization 
+- it need usually user's login details
+- if authentication fails, we usually get 401 error
+- for example: a bank customer or employee must prove identity before any action
+
+Authorization: 
+- in authorization, person's or user's authorities are checked for accessing the resources
+- authorizations are always happening after authentication
+- it need user's roles and privileges
+- if authorization fails, we usually get 403 error
+- once logged in the application, role and authorities will define which action can be done
+
+Authorities and roles information is stored inside GrantedAuthority. SimpleGrantedAuthority is the default 
+implementation of the GrantedAuthority interface and contains one method which is getAuthority()
+
+**Configuring authorities**
+In spring security, the authorities can be configured using the following ways: 
+- **hasAuthority():** accept a single authority for which the endpoint will be configured and user will be validated 
+  against the authority mentioned. Only users having the same authority configured can invoke the endpoint.
+- **hasAnyAuthority:** accept many authorities for which the endpoint will be configured ans user will be validated 
+  against the authorities mentioned. Only users having any of the authorities configured can invoke the endpoint.
+- **access():** Using Spring Expression Language (SPEL), provides unlimited possibilities for configuring authorities 
+  which are not possible with the above methods. We can use operator like OR, AND inside access() method.
+
+
+#### Authority vs Role
+Authority: 
+- Authority is like an individual privilege or an action
+- restricting access in a fine grained manner
+- ex. : VIEWACCOUNT, VIEWCARDS...
+
+Role: 
+- Role is a groupe of privilege / actions
+- Restricting access in a coarse grained manner
+- ex. ROLE_ADMIN, ROLE_USER
+
+The name of authorities are arbitrary in nature and these names can be customized as per business requirement. 
+Roles are also represented using the same contract GrantedAuthority in Spring Security. 
+When defining a role, its name should start by ROLE_ prefix. This prefix specifies the difference between a role and an 
+authority. An example would be to configure access based on country of the user or current time / date...
+
+
+**Configuring roles**
+In spring security, the roles can be configured using the following ways:
+- **hasRole():** accept a single role name for which the endpoint will be configured and user will be validated
+  against the role mentioned. Only users having the same role configured can invoke the endpoint.
+- **hasAnyRole:** accept many roles for which the endpoint will be configured ans user will be validated
+  against the roles mentioned. Only users having any of the roles configured can invoke the endpoint.
+- **access():** Using Spring Expression Language (SPEL), provides unlimited possibilities for configuring roles
+  which are not possible with the above methods. We can use operator like OR, AND inside access() method.
+
+
+
+
+
+
+
+
+
+
+
+

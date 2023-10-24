@@ -1,9 +1,14 @@
-drop database if exists bank;
-create database if not exists bank;
+# drop database if exists bank2;
+create database if not exists bank2;
 
-use bank;
+use bank2;
 
 drop table if exists `users`;
+drop table if exists `accounts`;
+drop table if exists `account_transactions`;
+drop table if exists `loans`;
+drop table if exists `cards`;
+drop table if exists `notice_details`;
 drop table if exists `authorities`;
 drop table if exists `customers`;
 drop table if exists `contact_messages`;
@@ -21,7 +26,7 @@ CREATE TABLE `customers` (
 );
 
 INSERT INTO `customers` (`name`,`email`,`mobile_number`, `pwd`, `role`,`create_dt`)
-VALUES ('Me','me@me.com','9876548337', '$2y$12$oRRbkNfwuR8ug4MlzH5FOeui.//1mkd.RsOAJMbykTSupVy.x/vb2', 'admin',CURDATE());
+VALUES ('Me','me@me.com','9876548337', '$10$NnG6TIr56zbHwjZBZpYX4ubbBhh2jTbLhtNuDM/dn3nC9BGWm31pO', 'admin',CURDATE());
 
 CREATE TABLE `accounts` (
     `customer_id` int NOT NULL,
@@ -168,3 +173,34 @@ CREATE TABLE `contact_messages` (
     `create_dt` date DEFAULT NULL,
     PRIMARY KEY (`contact_id`)
 );
+
+CREATE TABLE `authorities` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `customer_id` int NOT NULL,
+    `name` varchar(50) NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `customer_id` (`customer_id`),
+    CONSTRAINT `authorities_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `customers` (`customer_id`)
+);
+
+# we pass some available action that can be performed
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWACCOUNT');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWCARDS');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWLOANS');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWBALANCE');
+
+DELETE FROM `authorities`;
+
+# we pass specific authorities
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'ROLE_USER');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'ROLE_ADMIN');
