@@ -3,6 +3,7 @@ package com.bank.app.config.security;
 import com.bank.app.io.entity.CustomerEntity;
 import com.bank.app.io.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

@@ -196,3 +196,175 @@ password & login, using OAUth, using OTP also...
 Interface AuthenticationProvider provides 2 abstract methods: 
 - authenticate
 - supports (boolean): we inform spring security that the authentication provider is supporter
+
+### Step 5: managing CORS issue
+
+CORS is a protocol that enables script running on a browser client to interact with resources from different origin.
+For example if an UI app wish to make an API call running on a different domain, it would be blocked from doing so by
+default due to CORS. It is a specification from W3C implemented in most browsers. 
+
+So, CORS is not a security issue / attack but the default protection provided by browsers to stop sharing the data / 
+communication between differents origins. 
+
+Other origins means: 
+- a different SCHEME (http, https)
+- a different domain
+- a different port
+
+**>> Solution 1: Using @CrossOrigin annotation at controller level :** 
+
+    @CrossOrigin(origins="http://localhost:4200") 
+
+If we want to allow all origins: 
+
+    @CrossOrigin(origins="*")
+
+A preflight call will be sent to the backend that will return authorization to be called.
+This approach is not adapted to project containing many entry points. 
+
+**>> Solution 2: Global configuration :**
+
+We can set a CorsConfigurationSource to be used to define the defaultSecurityFilterChain
+
+    private CorsConfigurationSource corsConfigurationSource() {
+        final CorsConfiguration corsConfiguration = new CorsConfiguration();
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+        // corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
+        corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
+        corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+        corsConfiguration.setAllowCredentials(Boolean.TRUE);
+        corsConfiguration.setMaxAge(3600L);
+        source.registerCorsConfiguration("/**", corsConfiguration);
+        return source;
+    }
+
+In the defaultSecurityFilterChain method : 
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/users").authenticated()
+                .requestMatchers("/notices", "/contact", "/auth/register").permitAll())
+                .formLogin(withDefaults())
+                .httpBasic(withDefaults())
+                .build();
+    }
+
+
+### Step 6: managing CSRF issue
+
+A typical Cross Site Request Forgery (CSRF or XSTF) attack aims to perform an operation in a web application on behalf 
+of a user without their explicit consent. In general, it doesn't directly steal the user's identity but it exploits the
+user to carry out an action without their will. 
+
+Let's consider we are using a site like Netflix.com and the attacker is: evil.com (very nasty).
+- The netflix user login to netflix.com and the backend server of netflix will provide a cookie which will store in the 
+  browser agains the domain name netflix.com
+- the same netflix user opens evil.com website in another tab: let's consider the web page contains a link that can change
+  email of the netflix account (fake link on some nice proposal like 90% off on Iphone)
+- user tempted and click on malicious link which makes a request to Netflix.com And since login cookie is present in the
+  same browser and the request to change email is beeing made on netflix.com, the backend should not differentiate from 
+  where the request came. So here the evil.com forged the request as it was coming from netflix.com UI page... 
+
+This is how CSRF works in a theoretical level.
+
+**Solution**
+
+To defeat a CSRF attacj, application need a way to determine if the HTTP request is legitimately generated via the 
+application's user interface. The best way to achieve this is through a CSRF token. A CSRF token is a secure random
+String that is used to prevent CSRF attacks. The token need to be unique per session and should be of large random 
+value to make it hard to guess
+
+- Step 1: the netflix use login to netflix.com and the backend server of netflix will provide a cookie which will store 
+  in the browser against the domain name netflix.com along with a randomly generated unique CSRF token to this particular
+  user session. CSRF is inserted within the hidden parameters of HTML forms to avoid exposure to session cookies.
+- Step 2: the same netflix user opens an evil.com website in another tab as previously
+- Step 3: user clicked on the malicious link and make the request to netflix. And since login cookie already present in
+  the same browser and the request to change mail is being made to the same domain, the backend server is expecting
+  CSRF token along with the cookie. The token must be the same as initial value generated during login operation.
+
+
+    The CRSF token will be used by the application server to verify the legitimacy of the end user request if it is
+    coming from the same App UI or not. The application server rejects the request if the CSRF token fails to match the
+    test.
+
+
+**Step 1: create a csrfTokenRequestAttributeHandler**
+
+    public CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler() {
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName("_csrf");
+        return requestHandler;
+    }
+
+
+**Step 2: add the csrfTokenRequestAttributeHandler to the security filter chain**
+
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
+            .csrf((csrf) -> csrf
+            .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
+            .ignoringRequestMatchers("/contact", "/register")
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+            ...
+
+**Step 3: add a filter**
+
+We try to read the token from the http servlet and we convert it as attribute. The CSRF token will be present in the 
+response.
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+        if(null != csrfToken.getHeaderName()){
+            response.setHeader(csrfToken.getHeaderName(), csrfToken.getToken());
+        }
+        filterChain.doFilter(request, response);
+    }
+
+We just finally need to pass the filter to defaultSecurityFilterChain: 
+
+    ...
+    .csrf((csrf) -> csrf
+        .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
+        .ignoringRequestMatchers("/contact", "/register")
+        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+    .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+    ...
+
+**Step 4: login and authentication**
+
+Previously when we were trying to access the backend through the UI. We tell spring security to create 
+the JSESSIONID after initial login is completed and to send it to the front end application. The front
+end application can leverage the same id for all request that will be sent to backend.
+For this we added to defaultSecurityFilterChain: 
+
+    ...
+    .securityContext((context) -> context.requireExplicitSave(false))
+    .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+    ...
+
+Note that we have in AuthenticationController the following method that handles userDetails AFTER login.
+
+    @RequestMapping("/users")
+    public CustomerResponse getUserDetailsAfterLogin(Authentication authentication) {
+        List<CustomerDto> customerDto = userService.findByEmail(authentication.getName());
+        List<CustomerResponse> returnValue = modelMapper.map(customerDto, new TypeToken<List<CustomerResponse>>() {}.getType());
+        if (!returnValue.isEmpty()) {
+            return returnValue.get(0);
+        } else {
+            return null;
+        }
+    }
+
+The authentication is managed in defaultSecurityFilterChain: 
+
+      .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/auth/users").authenticated()
