@@ -425,13 +425,82 @@ In spring security, the roles can be configured using the following ways:
   which are not possible with the above methods. We can use operator like OR, AND inside access() method.
 
 
+### Step 8: custom security filters
 
+**Servlets and filters**
 
+Typical scenario in a web application: In java web applications, Servlet Container takes care of translating the HTTP messages for java code to understand.
+One of the mostly used servlet container is Apache Tomcat. Servlet container converts HTTP messages into ServletRequest and
+hand over to Servlet method as a parameter. Similarly, ServletResponse returns as an output to servlet container from Servlet.
+So any thing writen inside java web apps are driven by servlets.
 
+Roles of filters: Filters inside Java Web Application, can be used to intercept each request and response and do some pre work
+before out business logic. So using the same filters, Spring Security enforce security based on configuration inside a web application
 
+Filters are commonly used for security for : 
+- input validation
+- tracing auditing and reporting
+- logging
+- encryption / decryption 
+- multi factor authentication using OTP...
 
+Security filter chain is the following
+- DisableEncodeUrlFilter
+- WebAsyncManagerIntegrationFilter
+- SecurityContextHolderFilter
+- HeaderWriterFilter
+- CorsFilter
+- CrsfFilter
+- LogoutFilter
+- UsernamePasswordAuthenticationFilter
+- DefaultLoginPageGeneratingFilter
+- BasicAuthenticationFilter
+- RequestCacheAwareFilter
+- SecurityContextHolderAwareRequestFilter
+- AnonymousAuthenticationFilter
+- ExceptionTranslationFilter
+- FilterSecurityInterceptor
 
+In FilterChainProxy (in package org.springframework.security.web), we have the doFilter method that will iterate all filters : 
 
+		@Override
+		public void doFilter(ServletRequest request, ServletResponse response) throws IOException, ServletException {
+			if (this.currentPosition == this.size) {
+				this.originalChain.doFilter(request, response);
+				return;
+			}
+			this.currentPosition++;
+			Filter nextFilter = this.additionalFilters.get(this.currentPosition - 1);
+			if (logger.isTraceEnabled()) {
+				String name = nextFilter.getClass().getSimpleName();
+				logger.trace(LogMessage.format("Invoking %s (%d/%d)", name, this.currentPosition, this.size));
+			}
+			nextFilter.doFilter(request, response, this);
+		}
 
+	}
+
+In console:  
+![img_1.png](img_1.png)
+
+Once filter defined, we have to pass it to the defaultSecurityFilterChain method in Security 
+configuration with : 
+- addFilterBefore(filter, class): filter is added before the position of the specified filter class
+- addFilterAfter(filter, class): filter is added after
+- addFilterAt(filter, class): filter is added at the specific location of the specified filter class
+
+**Adding filters:** 
+
+    ...
+    .csrf((csrf) -> csrf
+       .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
+           .ignoringRequestMatchers("/auth/register")
+           .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+       .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+       .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+       .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+       .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+    ....
+    
 
 

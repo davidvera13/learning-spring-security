@@ -1,4 +1,4 @@
-package com.bank.app.config.security;
+package com.bank.app.config.security.filters;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

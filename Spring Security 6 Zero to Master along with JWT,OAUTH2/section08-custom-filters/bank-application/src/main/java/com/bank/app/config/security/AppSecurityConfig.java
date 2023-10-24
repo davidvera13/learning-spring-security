@@ -1,13 +1,15 @@
 package com.bank.app.config.security;
 
+import com.bank.app.config.security.filters.AuthoritiesLoggingAfterFilter;
+import com.bank.app.config.security.filters.AuthoritiesLoggingAtFilter;
+import com.bank.app.config.security.filters.CsrfCookieFilter;
+import com.bank.app.config.security.filters.RequestValidationBeforeFilter;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,8 +55,11 @@ public class AppSecurityConfig {
                         // "XSRF-TOKEN" and reads from the header "X-XSRF-TOKEN" following the conventions of
                         // AngularJS. When using with AngularJS be sure to use withHttpOnlyFalse().
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                // adding filters
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-
+                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
                 //return http.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
                         // we can give roles (group of authorities):
