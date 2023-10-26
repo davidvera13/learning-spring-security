@@ -7,34 +7,35 @@ import {getCookie} from "typescript-cookie";
 
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  authStatus: string = "";
-  model = new User();
+    authStatus: string = "";
+    model = new User();
 
-  constructor(private loginService: LoginService, private router: Router) {
+    constructor(private loginService: LoginService, private router: Router) {
 
-   }
+    }
 
-  ngOnInit(): void {
+    ngOnInit(): void {
 
-  }
+    }
 
-  validateUser(loginForm: NgForm) {
-    this.loginService.validateLoginDetails(this.model).subscribe(
-      responseData => {
-        this.model = <any> responseData.body;
-        // handling cookie and store it
-        let xsrf = getCookie('XSRF-TOKEN')!;
-        window.sessionStorage.setItem('XSRF-TOKEN', xsrf);
-        this.model.authStatus = 'AUTH';
-        window.sessionStorage.setItem("userdetails",JSON.stringify(this.model));
-        this.router.navigate(['dashboard']);
-      });
+    validateUser(loginForm: NgForm) {
+        this.loginService.validateLoginDetails(this.model).subscribe(
+            responseData => {
+                window.sessionStorage.setItem("Authorization",responseData.headers.get('Authorization')!);
+                this.model = <any> responseData.body;
+                this.model.authStatus = 'AUTH';
+                window.sessionStorage.setItem("userdetails",JSON.stringify(this.model));
+                // handling cookie and store it
+                let xsrf = getCookie('XSRF-TOKEN')!;
+                window.sessionStorage.setItem('XSRF-TOKEN', xsrf);
+                this.router.navigate(['dashboard']);
+            });
 
-  }
+    }
 
 }

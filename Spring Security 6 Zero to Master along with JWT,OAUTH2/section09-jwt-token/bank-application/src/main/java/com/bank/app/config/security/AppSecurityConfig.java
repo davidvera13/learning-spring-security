@@ -1,9 +1,6 @@
 package com.bank.app.config.security;
 
-import com.bank.app.config.security.filters.AuthoritiesLoggingAfterFilter;
-import com.bank.app.config.security.filters.AuthoritiesLoggingAtFilter;
-import com.bank.app.config.security.filters.CsrfCookieFilter;
-import com.bank.app.config.security.filters.RequestValidationBeforeFilter;
+import com.bank.app.config.security.filters.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +20,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -60,6 +59,8 @@ public class AppSecurityConfig {
                 .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
                 .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
                 .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JwtTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JwtTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 //return http.csrf((csrf) -> csrf.disable())
                 .authorizeHttpRequests((requests) -> requests
                         // we can give roles (group of authorities):
@@ -110,6 +111,7 @@ public class AppSecurityConfig {
         corsConfiguration.setAllowedOriginPatterns(Collections.singletonList("*"));
         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
         corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+        corsConfiguration.setExposedHeaders(List.of("Authorization"));
         corsConfiguration.setAllowCredentials(Boolean.TRUE);
         //corsConfiguration.setMaxAge(3600L);
         source.registerCorsConfiguration("/**", corsConfiguration);
