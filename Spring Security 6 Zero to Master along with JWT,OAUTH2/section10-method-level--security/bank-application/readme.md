@@ -508,3 +508,71 @@ configuration with :
 - A token can be a plain strng of format universally unique identifier (UUID) or of type JSON Web Token (JWT) usually
 generated when user authenticates for the first time during login.
 - On every request to a restricted resource, the client sends the access token in the query string or authorization header.
+
+### Step 10: method level security
+- Once security rules are applied in security configuration class, method level security can be enabled using annotation 
+  @EnableMethodSecurity on the configuration class. 
+- Method level security will also helps authorization rules even in the non web applications where will not have any 
+  endpoint
+
+Method level security provides the below approaches to apply the authorization rules and executing business logic. 
+- invocation authorizations: validates if someone can invoke a method or not base on roles / authorities
+- filtering authorizations: validates what a method can receive through its parameters and what the invoker can receive
+  back from the method post business logic execution
+
+Spring security will use the aspects from the AOP module and have the interceptors in between the method invocation to 
+apply the authorization rule configured. 
+Method level security offers below 3 different styles for configuring the authorization rules on top of the methods:
+- the `prePostEnabled` property enables Spring Security `@PreAuthorize` and `@PostAuthorize` annotations 
+- the `securedEnabled` property enables `@Secured` annotation
+- the `jsr250Enabled` property enables `@RoleAllowed` annotations
+
+  
+    @Configuration
+    @EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+    public class AppSecurityConfig {
+        ....
+    }
+
+Note : `@Secured` and `@RoleAllowed` are less powerful compared to `@PreAuthorize` and `@PostAuthoriza` annotations.
+
+Using invocation authorization we can decide if a user is authorized to invoke a method before the 
+method (preAuthorization) or after the method execution is completed (postAuthorization). Fof filtering before: 
+
+    @Service
+    public class LoanService {
+        @PreAuthorize("hasAuthority('VIEWLOANS')")
+        @PrAuthoriza("HasRole('ADMIN')")
+        @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+        @PreAuthorize('#username === authentication.principal.username")
+        public Loan getLoanDetails(String username) {
+            ...
+        }
+    }
+
+When implementing complex authorization logic, we can separate the login using a separate class that implements
+`PermissionEvaluator` and overwrite the method hasPermission() inside it which can be leveraged inside the hasPermission 
+configurations.
+
+In specific scenarios, we want to make sure the parameters sent and received from and to the method need to follow 
+authorization rules or filtering criteria, then we can consider filtering.
+For filtering, the parameters before calling the method we can use PreFilter annotation. Not the filterObject should be
+of type collection interface
+
+    @RestController
+    public class ContactController {
+        @PreFilter("filterObject.contactName != 'Test'")
+        public List<ContactResponse> saveContactInquiryDetails(@RequestBody List<ContactRequest> contact) {
+        }
+
+    }
+
+We can also use PotFilter: 
+
+    @RestController
+    public class ContactController {
+        @PostFilter("filterObject.contactName != 'Test'")
+        public List<ContactResponse> saveContactInquiryDetails(@RequestBody List<ContactRequest> contact) {
+        }
+
+    }

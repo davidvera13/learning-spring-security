@@ -6,6 +6,7 @@ import com.bank.app.shared.dto.LoanDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ public class LoansController {
         this.loanService = loanService;
     }
 
+    @PostAuthorize("hasRole('USER')")
     @GetMapping("/myLoans")
     public List<LoanResponse> getLoanDetails(@RequestParam long id) {
         List<LoanDto> loanDtos = loanService.findByCustomerIdOrderByStartDtDesc(id);

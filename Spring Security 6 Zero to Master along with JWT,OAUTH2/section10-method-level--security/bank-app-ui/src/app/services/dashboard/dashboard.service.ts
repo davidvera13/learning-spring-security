@@ -34,7 +34,13 @@ export class DashboardService {
 
   // we need to have withCredentials to persist in db 
   saveMessage(contact : Contact){
-    return this.http.post(environment.rooturl + AppConstants.CONTACT_API_URL,contact,{ observe: 'response',withCredentials: true });
+    // we expect list of contacts as we use @PreFilter
+    let contacts = [];
+    contacts.push(contact)
+    return this.http.post(
+        environment.rooturl + AppConstants.CONTACT_API_URL,
+        contacts,
+        { observe: 'response',withCredentials: true });
   }
 
 }
