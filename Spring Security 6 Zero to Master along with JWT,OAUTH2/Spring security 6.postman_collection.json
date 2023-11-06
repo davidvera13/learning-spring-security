@@ -1,0 +1,690 @@
+{
+	"info": {
+		"_postman_id": "ea11df6e-b226-4afc-ae39-8c6cd3c07123",
+		"name": "Spring security 6",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5840420"
+	},
+	"item": [
+		{
+			"name": "using client credentials grant type",
+			"item": [
+				{
+					"name": "step01 - oauth2 request token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Basic bWVAbWUuY29tOmFiYzEyMw==",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "bankAppId",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "bDIr4VnxR57eXHNYizrifZbPIgNfWSoH",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid email profile address",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8180/realms/bankApp/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8180",
+							"path": [
+								"realms",
+								"bankApp",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "step02 - access token to resource server",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6YjMzNnlkMWl2TzNVTm1NS190T0xfRl95Q2lHLW1aTVp5ZzJEWWVuVmI4In0.eyJleHAiOjE2OTg5MDQ2OTUsImlhdCI6MTY5ODkwNDM5NSwianRpIjoiY2JjZWRjNjItYWUwZi00ZDI1LTliZGQtMzQ2NDdlMmZlMDM0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL3JlYWxtcy9iYW5rQXBwIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjYxYmM0OGE2LTZhYmQtNDkwZS05NTAyLTBiMzE3MDA3NTU4YyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImJhbmtBcHBJZCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtYmFua2FwcCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJBRE1JTiIsIlVTRVIiXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIGFkZHJlc3MiLCJjbGllbnRIb3N0IjoiMTcyLjE3LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiYWRkcmVzcyI6e30sInByZWZlcnJlZF91c2VybmFtZSI6InNlcnZpY2UtYWNjb3VudC1iYW5rYXBwaWQiLCJjbGllbnRBZGRyZXNzIjoiMTcyLjE3LjAuMSIsImNsaWVudF9pZCI6ImJhbmtBcHBJZCJ9.FtnYeaGR_2-cLq9yQ-45na1-6E54fFz5Zqepf9dNG2QIT2bpuA6DlglyoisaGXNbqLMVziLClKBXkMyXIMDLRPfAAnnsrC7G-NqSfpZ84NkLx3Ztb9tUkBLhapys7SYtIv8xDqY_KI23MKKBuTd4RKaUJvkw7pkbe9pg7r1RnbpEFxr9T2QMdyxoOw4AdC00GX6PH_LjvR2LTngNc9JILr2vY4aSf9zSBogzHnwENDnuyc3AOf56EsHeud5e6tvCTSwfj3rqQIXC4g_FPYZTjUPgbazaeC-4dqi4Apqtp1XweeQB81hG_QnVNa-n537Mtel_Atcr6qt-hFcVtIGYBg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "bankAppId",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "bDIr4VnxR57eXHNYizrifZbPIgNfWSoH",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid email profile address",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/myBalance?email=me@me.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"myBalance"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "me@me.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "using authorization code grant type",
+			"item": [
+				{
+					"name": "step01 - authentitcate to client",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8180/realms/bankApp/protocol/openid-connect/auth?client_id=bankClient&response_type=code&scope=openid&redirect_uri=http://localhost:4200/noclientUrl&state=someRandomValue",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8180",
+							"path": [
+								"realms",
+								"bankApp",
+								"protocol",
+								"openid-connect",
+								"auth"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "bankClient"
+								},
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "scope",
+									"value": "openid"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:4200/noclientUrl"
+								},
+								{
+									"key": "state",
+									"value": "someRandomValue"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "authentitcate to clien",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8180/realms/bankApp/protocol/openid-connect/auth?client_id=bankClient&response_type=code&scope=openid&redirect_uri=http://localhost:4200/noclientUrl&state=someRandomValue",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8180",
+									"path": [
+										"realms",
+										"bankApp",
+										"protocol",
+										"openid-connect",
+										"auth"
+									],
+									"query": [
+										{
+											"key": "client_id",
+											"value": "bankClient"
+										},
+										{
+											"key": "response_type",
+											"value": "code"
+										},
+										{
+											"key": "scope",
+											"value": "openid"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "http://localhost:4200/noclientUrl"
+										},
+										{
+											"key": "state",
+											"value": "someRandomValue"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Robots-Tag",
+									"value": "none"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-store, must-revalidate, max-age=0"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AUTH_SESSION_ID=698751ff-6e64-4ada-8c91-7fec24ec89c0; Version=1; Path=/realms/bankApp/; SameSite=None; Secure; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AUTH_SESSION_ID_LEGACY=698751ff-6e64-4ada-8c91-7fec24ec89c0; Version=1; Path=/realms/bankApp/; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "KC_RESTART=eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5YWMzODRlYy1kMzI3LTRlMmEtYTllYy1kOTNlODk3NDAxMzQifQ.eyJjaWQiOiJiYW5rQ2xpZW50IiwicHR5Ijoib3BlbmlkLWNvbm5lY3QiLCJydXJpIjoiaHR0cDovL2xvY2FsaG9zdDo0MjAwL25vY2xpZW50VXJsIiwiYWN0IjoiQVVUSEVOVElDQVRFIiwibm90ZXMiOnsic2NvcGUiOiJvcGVuaWQiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgxODAvcmVhbG1zL2JhbmtBcHAiLCJyZXNwb25zZV90eXBlIjoiY29kZSIsInJlZGlyZWN0X3VyaSI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIwMC9ub2NsaWVudFVybCIsInN0YXRlIjoic29tZVJhbmRvbVZhbHVlIn19.jQ6axnSzmvmNtZAYNF8_OZ16x0f8ogOJr5P0UChTF8I; Version=1; Path=/realms/bankApp/; HttpOnly"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html;charset=utf-8"
+								},
+								{
+									"key": "content-length",
+									"value": "3402"
+								}
+							],
+							"cookie": [],
+							"body": "<!DOCTYPE html>\n<html class=\"login-pf\">\n    <head>\n        <meta charset=\"utf-8\">\n        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n        <meta name=\"robots\" content=\"noindex, nofollow\">\n        <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n        <title>Sign in to bankApp</title>\n        <link rel=\"icon\" href=\"/resources/a97r0/login/keycloak/img/favicon.ico\" />\n        <link href=\"/resources/a97r0/common/keycloak/web_modules/@patternfly/react-core/dist/styles/base.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/web_modules/@patternfly/react-core/dist/styles/app.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/node_modules/patternfly/dist/css/patternfly.min.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/node_modules/patternfly/dist/css/patternfly-additions.min.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/lib/pficon/pficon.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/login/keycloak/css/login.css\" rel=\"stylesheet\" />\n    </head>\n    <body class=\"\">\n        <div class=\"login-pf-page\">\n            <div id=\"kc-header\" class=\"login-pf-page-header\">\n                <div id=\"kc-header-wrapper\"\n             class=\"\">bankApp</div>\n            </div>\n            <div class=\"card-pf\">\n                <header class=\"login-pf-header\">\n                    <h1 id=\"kc-page-title\">        Sign in to your account\n\n</h1>\n                </header>\n                <div id=\"kc-content\">\n                    <div id=\"kc-content-wrapper\">\n                        <div id=\"kc-form\">\n                            <div id=\"kc-form-wrapper\">\n                                <form id=\"kc-form-login\" onsubmit=\"login.disabled = true; return true;\" action=\"http://localhost:8180/realms/bankApp/login-actions/authenticate?session_code=KHLo-NORgo-wKiiPm_scaNrcHPdL4dN7kACBV9PmDrc&amp;execution=c3d8aa84-199d-49e3-8d8e-b9395f203d9d&amp;client_id=bankClient&amp;tab_id=ImlJ_kCZIsU\" method=\"post\">\n                                    <div class=\"form-group\">\n                                        <label for=\"username\" class=\"pf-c-form__label pf-c-form__label-text\">Username or email</label>\n                                        <input tabindex=\"1\" id=\"username\" class=\"pf-c-form-control\" name=\"username\" value=\"\"  type=\"text\" autofocus autocomplete=\"off\"\n                               aria-invalid=\"\"\n                        />\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"password\" class=\"pf-c-form__label pf-c-form__label-text\">Password</label>\n                                        <input tabindex=\"2\" id=\"password\" class=\"pf-c-form-control\" name=\"password\" type=\"password\" autocomplete=\"off\"\n                           aria-invalid=\"\"\n                    />\n                                    </div>\n                                    <div class=\"form-group login-pf-settings\">\n                                        <div id=\"kc-form-options\">\n                        </div>\n                                        <div class=\"\">\n                        </div>\n                                    </div>\n                                    <div id=\"kc-form-buttons\" class=\"form-group\">\n                                        <input type=\"hidden\" id=\"id-hidden-input\" name=\"credentialId\" />\n                                        <input tabindex=\"4\" class=\"pf-c-button pf-m-primary pf-m-block btn-lg\" name=\"login\" id=\"kc-login\" type=\"submit\" value=\"Sign In\"/>\n                                    </div>\n                                </form>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </body>\n</html>"
+						}
+					]
+				},
+				{
+					"name": "step02 - get access token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "bankClient",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "ngv4dtJ26UqF1QQvEjArC0Y4ay79c1wG",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "d43b39c0-6de7-4c0c-a262-0963414047a4.359a03a2-7d95-4b38-ad18-3864efd56b99.9f28bd0c-1816-4584-9b38-e1d9e2382645",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:4200/noclientUrl",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8180/realms/bankApp/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8180",
+							"path": [
+								"realms",
+								"bankApp",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "step03 - access token to resource server",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6YjMzNnlkMWl2TzNVTm1NS190T0xfRl95Q2lHLW1aTVp5ZzJEWWVuVmI4In0.eyJleHAiOjE2OTkxMjI0NjAsImlhdCI6MTY5OTEyMjE2MCwiYXV0aF90aW1lIjoxNjk5MTIyMTE3LCJqdGkiOiIwNDk3ZjRjNi1hMjRhLTQyNzItOGM0Zi0xZWU2MDRhMzk4OTIiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgxODAvcmVhbG1zL2JhbmtBcHAiLCJhdWQiOiJhY2NvdW50Iiwic3ViIjoiMzVhMjc4Y2QtMWJhNC00ZTBiLTg5NmYtN2FlNDdiODYzYjUzIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiYmFua0NsaWVudCIsInNlc3Npb25fc3RhdGUiOiIzNTlhMDNhMi03ZDk1LTRiMzgtYWQxOC0zODY0ZWZkNTZiOTkiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDIwMCJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsiZGVmYXVsdC1yb2xlcy1iYW5rYXBwIiwib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiIsIkFETUlOIiwiVVNFUiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7ImFjY291bnQiOnsicm9sZXMiOlsibWFuYWdlLWFjY291bnQiLCJtYW5hZ2UtYWNjb3VudC1saW5rcyIsInZpZXctcHJvZmlsZSJdfX0sInNjb3BlIjoib3BlbmlkIGVtYWlsIHByb2ZpbGUiLCJzaWQiOiIzNTlhMDNhMi03ZDk1LTRiMzgtYWQxOC0zODY0ZWZkNTZiOTkiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmFtZSI6IkRhdmlkIFZlcmEiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJkYXZpZCIsImdpdmVuX25hbWUiOiJEYXZpZCIsImZhbWlseV9uYW1lIjoiVmVyYSIsImVtYWlsIjoibWVAbWUuY29tIn0.scT0AiykitYdnexb2ziabony7gle37vDC7FNcTAvOjcUl7CaG92Rbumc-qw8Kou5bVylxIIl9LoLCuFGOf61MJcr1H1M2JNFGqlqG4Wsh2Q4eQFaWdGdOLFJ-SVZgwkYZ5d1e8YOR-bw3RiUFdFpwfFhLPo_WhT78NWdniu5IBXO25u58r5RXxMI3Pqh2BHUK-45YPKOZS0AQEkMTBl4hqYsQpF8o7Pa2_sfPbwhNOmHKrp8D7is41hE-85CXuDSwwo0y2mKFCJkel2GdwRfNDtvarJp0MX42AYMHk809yvS68OMTZe8tzPskYtTclqJd5b11QHwE-npAal0im6BVg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "bankAppId",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "bDIr4VnxR57eXHNYizrifZbPIgNfWSoH",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid email profile address",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/myBalance?email=me@me.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"myBalance"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "me@me.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "using authorization code grant type with PKCE",
+			"item": [
+				{
+					"name": "step01 - authentitcate to client",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8180/realms/bankApp/protocol/openid-connect/auth?client_id=bankClient&response_type=code&scope=openid&redirect_uri=http://localhost:4200/noclientUrl&state=someRandomValue",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8180",
+							"path": [
+								"realms",
+								"bankApp",
+								"protocol",
+								"openid-connect",
+								"auth"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "bankClient"
+								},
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "scope",
+									"value": "openid"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:4200/noclientUrl"
+								},
+								{
+									"key": "state",
+									"value": "someRandomValue"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "authentitcate to clien",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8180/realms/bankApp/protocol/openid-connect/auth?client_id=bankClient&response_type=code&scope=openid&redirect_uri=http://localhost:4200/noclientUrl&state=someRandomValue",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8180",
+									"path": [
+										"realms",
+										"bankApp",
+										"protocol",
+										"openid-connect",
+										"auth"
+									],
+									"query": [
+										{
+											"key": "client_id",
+											"value": "bankClient"
+										},
+										{
+											"key": "response_type",
+											"value": "code"
+										},
+										{
+											"key": "scope",
+											"value": "openid"
+										},
+										{
+											"key": "redirect_uri",
+											"value": "http://localhost:4200/noclientUrl"
+										},
+										{
+											"key": "state",
+											"value": "someRandomValue"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Robots-Tag",
+									"value": "none"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-store, must-revalidate, max-age=0"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "Content-Security-Policy",
+									"value": "frame-src 'self'; frame-ancestors 'self'; object-src 'none';"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AUTH_SESSION_ID=698751ff-6e64-4ada-8c91-7fec24ec89c0; Version=1; Path=/realms/bankApp/; SameSite=None; Secure; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AUTH_SESSION_ID_LEGACY=698751ff-6e64-4ada-8c91-7fec24ec89c0; Version=1; Path=/realms/bankApp/; HttpOnly"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "KC_RESTART=eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5YWMzODRlYy1kMzI3LTRlMmEtYTllYy1kOTNlODk3NDAxMzQifQ.eyJjaWQiOiJiYW5rQ2xpZW50IiwicHR5Ijoib3BlbmlkLWNvbm5lY3QiLCJydXJpIjoiaHR0cDovL2xvY2FsaG9zdDo0MjAwL25vY2xpZW50VXJsIiwiYWN0IjoiQVVUSEVOVElDQVRFIiwibm90ZXMiOnsic2NvcGUiOiJvcGVuaWQiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgxODAvcmVhbG1zL2JhbmtBcHAiLCJyZXNwb25zZV90eXBlIjoiY29kZSIsInJlZGlyZWN0X3VyaSI6Imh0dHA6Ly9sb2NhbGhvc3Q6NDIwMC9ub2NsaWVudFVybCIsInN0YXRlIjoic29tZVJhbmRvbVZhbHVlIn19.jQ6axnSzmvmNtZAYNF8_OZ16x0f8ogOJr5P0UChTF8I; Version=1; Path=/realms/bankApp/; HttpOnly"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block"
+								},
+								{
+									"key": "Content-Language",
+									"value": "en"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html;charset=utf-8"
+								},
+								{
+									"key": "content-length",
+									"value": "3402"
+								}
+							],
+							"cookie": [],
+							"body": "<!DOCTYPE html>\n<html class=\"login-pf\">\n    <head>\n        <meta charset=\"utf-8\">\n        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n        <meta name=\"robots\" content=\"noindex, nofollow\">\n        <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"/>\n        <title>Sign in to bankApp</title>\n        <link rel=\"icon\" href=\"/resources/a97r0/login/keycloak/img/favicon.ico\" />\n        <link href=\"/resources/a97r0/common/keycloak/web_modules/@patternfly/react-core/dist/styles/base.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/web_modules/@patternfly/react-core/dist/styles/app.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/node_modules/patternfly/dist/css/patternfly.min.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/node_modules/patternfly/dist/css/patternfly-additions.min.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/common/keycloak/lib/pficon/pficon.css\" rel=\"stylesheet\" />\n        <link href=\"/resources/a97r0/login/keycloak/css/login.css\" rel=\"stylesheet\" />\n    </head>\n    <body class=\"\">\n        <div class=\"login-pf-page\">\n            <div id=\"kc-header\" class=\"login-pf-page-header\">\n                <div id=\"kc-header-wrapper\"\n             class=\"\">bankApp</div>\n            </div>\n            <div class=\"card-pf\">\n                <header class=\"login-pf-header\">\n                    <h1 id=\"kc-page-title\">        Sign in to your account\n\n</h1>\n                </header>\n                <div id=\"kc-content\">\n                    <div id=\"kc-content-wrapper\">\n                        <div id=\"kc-form\">\n                            <div id=\"kc-form-wrapper\">\n                                <form id=\"kc-form-login\" onsubmit=\"login.disabled = true; return true;\" action=\"http://localhost:8180/realms/bankApp/login-actions/authenticate?session_code=KHLo-NORgo-wKiiPm_scaNrcHPdL4dN7kACBV9PmDrc&amp;execution=c3d8aa84-199d-49e3-8d8e-b9395f203d9d&amp;client_id=bankClient&amp;tab_id=ImlJ_kCZIsU\" method=\"post\">\n                                    <div class=\"form-group\">\n                                        <label for=\"username\" class=\"pf-c-form__label pf-c-form__label-text\">Username or email</label>\n                                        <input tabindex=\"1\" id=\"username\" class=\"pf-c-form-control\" name=\"username\" value=\"\"  type=\"text\" autofocus autocomplete=\"off\"\n                               aria-invalid=\"\"\n                        />\n                                    </div>\n                                    <div class=\"form-group\">\n                                        <label for=\"password\" class=\"pf-c-form__label pf-c-form__label-text\">Password</label>\n                                        <input tabindex=\"2\" id=\"password\" class=\"pf-c-form-control\" name=\"password\" type=\"password\" autocomplete=\"off\"\n                           aria-invalid=\"\"\n                    />\n                                    </div>\n                                    <div class=\"form-group login-pf-settings\">\n                                        <div id=\"kc-form-options\">\n                        </div>\n                                        <div class=\"\">\n                        </div>\n                                    </div>\n                                    <div id=\"kc-form-buttons\" class=\"form-group\">\n                                        <input type=\"hidden\" id=\"id-hidden-input\" name=\"credentialId\" />\n                                        <input tabindex=\"4\" class=\"pf-c-button pf-m-primary pf-m-block btn-lg\" name=\"login\" id=\"kc-login\" type=\"submit\" value=\"Sign In\"/>\n                                    </div>\n                                </form>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </body>\n</html>"
+						}
+					]
+				},
+				{
+					"name": "step02 - get access token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "bankClient",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "ngv4dtJ26UqF1QQvEjArC0Y4ay79c1wG",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "d43b39c0-6de7-4c0c-a262-0963414047a4.359a03a2-7d95-4b38-ad18-3864efd56b99.9f28bd0c-1816-4584-9b38-e1d9e2382645",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:4200/noclientUrl",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8180/realms/bankApp/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8180",
+							"path": [
+								"realms",
+								"bankApp",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "step03 - access token to resource server Copy",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJ6YjMzNnlkMWl2TzNVTm1NS190T0xfRl95Q2lHLW1aTVp5ZzJEWWVuVmI4In0.eyJleHAiOjE2OTg5MDQ2OTUsImlhdCI6MTY5ODkwNDM5NSwianRpIjoiY2JjZWRjNjItYWUwZi00ZDI1LTliZGQtMzQ2NDdlMmZlMDM0IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL3JlYWxtcy9iYW5rQXBwIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6IjYxYmM0OGE2LTZhYmQtNDkwZS05NTAyLTBiMzE3MDA3NTU4YyIsInR5cCI6IkJlYXJlciIsImF6cCI6ImJhbmtBcHBJZCIsImFjciI6IjEiLCJhbGxvd2VkLW9yaWdpbnMiOlsiLyoiXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtYmFua2FwcCIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iLCJBRE1JTiIsIlVTRVIiXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6Im9wZW5pZCBlbWFpbCBwcm9maWxlIGFkZHJlc3MiLCJjbGllbnRIb3N0IjoiMTcyLjE3LjAuMSIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwiYWRkcmVzcyI6e30sInByZWZlcnJlZF91c2VybmFtZSI6InNlcnZpY2UtYWNjb3VudC1iYW5rYXBwaWQiLCJjbGllbnRBZGRyZXNzIjoiMTcyLjE3LjAuMSIsImNsaWVudF9pZCI6ImJhbmtBcHBJZCJ9.FtnYeaGR_2-cLq9yQ-45na1-6E54fFz5Zqepf9dNG2QIT2bpuA6DlglyoisaGXNbqLMVziLClKBXkMyXIMDLRPfAAnnsrC7G-NqSfpZ84NkLx3Ztb9tUkBLhapys7SYtIv8xDqY_KI23MKKBuTd4RKaUJvkw7pkbe9pg7r1RnbpEFxr9T2QMdyxoOw4AdC00GX6PH_LjvR2LTngNc9JILr2vY4aSf9zSBogzHnwENDnuyc3AOf56EsHeud5e6tvCTSwfj3rqQIXC4g_FPYZTjUPgbazaeC-4dqi4Apqtp1XweeQB81hG_QnVNa-n537Mtel_Atcr6qt-hFcVtIGYBg",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "bankAppId",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "bDIr4VnxR57eXHNYizrifZbPIgNfWSoH",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid email profile address",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/myBalance?email=me@me.com",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"myBalance"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "me@me.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

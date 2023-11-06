@@ -10,4 +10,5 @@ import java.util.List;
 public interface CustomerRepository extends CrudRepository<CustomerEntity, Long> {
     // abstact method: derived method name query
     List<CustomerEntity> findByEmail(String email);
+
 }

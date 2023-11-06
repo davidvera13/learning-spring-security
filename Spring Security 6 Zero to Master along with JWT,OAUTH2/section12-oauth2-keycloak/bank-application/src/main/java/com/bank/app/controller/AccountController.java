@@ -20,10 +20,16 @@ public class AccountController {
         this.accountService = accountService;
     }
 
+//    @GetMapping("/myAccount")
+//    public AccountResponse getAccountDetails(@RequestParam long id) {
+//        // return "Here are the account details from the DB";
+//        AccountDto accountDto = accountService.findByCustomerId(id);
+//        return new ModelMapper().map(accountDto, AccountResponse.class);
+//    }
     @GetMapping("/myAccount")
-    public AccountResponse getAccountDetails(@RequestParam long id) {
+    public AccountResponse getAccountDetails(@RequestParam String email) {
         // return "Here are the account details from the DB";
-        AccountDto accountDto = accountService.findByCustomerId(id);
+        AccountDto accountDto = accountService.findByEmail(email);
         return new ModelMapper().map(accountDto, AccountResponse.class);
     }
 

@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface AccountTransactionService {
     List<AccountTransactionDto> findByCustomerIdOrderByTransactionDtDesc(long id);
+
+    List<AccountTransactionDto> findByCustomerEmailByTransactionDtDesc(String email);
 }

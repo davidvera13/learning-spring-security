@@ -632,7 +632,287 @@ What is openID Connect:
 - With the ID token, OpenID Connect brings standards around sharing identity details among the applications. 
 
 ### Step 12: OAuth2 & KeyCloak
-KayCloak
+KayCloak is available for downloads here: https://www.keycloak.org/downloads
+For setup documentation : https://www.keycloak.org/guides#getting-started
+See also readme in keycloack source code
+
+If we want we can also run as docker image:
+https://www.keycloak.org/getting-started/getting-started-docker
+
+    docker run -p 8180:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.5 start-dev
+
+Here admin password and username are already configured.
+
+![img_2.png](img_2.png)
+
+Once connected, we can configure a "realm". Each realm contains specific configuration for specific environment.
+
+![img_3.png](img_3.png)
+
+
+Once a real created, we can manage users, groups, scopes, roles, clients...
+
+![img_4.png](img_4.png)
+
+**Create client credentials**
+Select clients in the left side navigation and click on "create client"
+
+![img_5.png](img_5.png)
+
+First, configure general setting then click next
+
+![img_6.png](img_6.png)
+
+![img_7.png](img_7.png)
+
+
+**Registration access token:** eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI5YWMzODRlYy1kMzI3LTRlMmEtYTllYy1kOTNlODk3NDAxMzQifQ.eyJleHAiOjAsImlhdCI6MTY5ODgzMzY5NywianRpIjoiNTI1NWE0YTEtZGI1OC00ZDkxLWFjN2ItOTkxNzlkYTllYzRkIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL3JlYWxtcy9iYW5rQXBwIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MTgwL3JlYWxtcy9iYW5rQXBwIiwidHlwIjoiUmVnaXN0cmF0aW9uQWNjZXNzVG9rZW4iLCJyZWdpc3RyYXRpb25fYXV0aCI6ImF1dGhlbnRpY2F0ZWQifQ.AmvrEjYLMR6p8xSwJRYCZwcTFdponUxHDOEk7o_uGTg
+**Client secret:** bDIr4VnxR57eXHNYizrifZbPIgNfWSoH
+
+**Setup resource server**
+The resource server contains accounts: backend must be updated. 
+
+We have to add maven dependency: 
+
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-oauth2-resource-server -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+    </dependency>
+
+We have to implement a converter class: !!!!!!!
+
+    public class KeycloakRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+    
+        @Override
+        public Collection<GrantedAuthority> convert(Jwt jwt) {
+            Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
+    
+            if (realmAccess == null || realmAccess.isEmpty()) {
+                return new ArrayList<>();
+            }
+    
+            return ((List<String>) realmAccess.get("roles"))
+                    .stream().map(roleName -> "ROLE_" + roleName)
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+        }
+    }
+
+Then we have to setup a JwtAuthenticationConverter
+
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
+        return converter;
+    }
 
 
 
+And add it to defaultSecurityFilterChain
+
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .securityContext((context) -> context.requireExplicitSave(false))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.ALWAYS))
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(corsConfigurationSource()))
+                .csrf((csrf) -> csrf
+                        .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/auth/register")
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/myAccount").hasRole("USER")
+                        .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/myLoans").authenticated()
+                        .requestMatchers("/myCards").hasRole("USER")
+                        .requestMatchers( "/contact", "/auth/users").authenticated()
+                        .requestMatchers("/notices", "/auth/register").permitAll())
+                .oauth2ResourceServer(oauth2ResourceServerCustomizer ->
+                                oauth2ResourceServerCustomizer.jwt(jwtCustomizer ->
+                                        jwtCustomizer.jwtAuthenticationConverter(jwtAuthenticationConverter())))
+                .build();
+    }
+
+Finally, in application properties, we have to set jwt url based on created realm.
+
+    spring.security.oauth2.resourceserver.jwt.jwk-set-uri=http://localhost:8180/realms/bankApp/protocol/openid-connect/certs
+
+**Usinng client credentials grant type : Getting an access token**
+We need to send a request to authorization server to retrieve an access token. 
+What is the URL to call ? 
+By consulting the following URL: http://localhost:8180/realms/bankApp/.well-known/openid-configuration
+
+![img_8.png](img_8.png)
+
+We have to use the token endpoint: http://localhost:8180/realms/bankApp/protocol/openid-connect/token
+We use the jwks-uri in application properties to get access to public certificate: 
+- "jwks_uri": "http://localhost:8180/realms/bankApp/protocol/openid-connect/certs",
+
+We can send a post request to get the token : 
+
+![img_9.png](img_9.png)
+
+In jwt website: 
+
+![img_10.png](img_10.png)
+
+Note: as response we retrieve the roles and we note that by default roles used by rest API are not defined in 
+keycloak. We can create roles manually in Keycloak administration. 
+
+![img_11.png](img_11.png)
+
+After this step : click on "clients", then the name of the client created. 
+In the screenshot, "bankAppId": 
+
+![img_12.png](img_12.png)
+
+Then select service account roles and click on assign roles: 
+
+![img_13.png](img_13.png)
+
+**Using Authorization code grant type**
+This grant type is not recommended for front end application. It can be used for API to API communication.
+- click on client and in client list, select "create client"
+- set client id and name
+- then click on "next"
+- 
+![img_14.png](img_14.png)
+
+At next step: 
+- enable client authentication
+- select standard flow (we can disable direct access grant)
+
+![img_15.png](img_15.png)
+
+Finally, we should configure redirect URL. It should be a valid URL to redirect on front end application. 
+
+![img_16.png](img_16.png)
+
+We also need to create a User: 
+
+![img_17.png](img_17.png)
+
+Once created, we have to create credentials for the user: 
+
+![img_18.png](img_18.png)
+
+Click on set password: 
+
+![img_19.png](img_19.png)
+
+We also have to pass roles: 
+
+![img_22.png](img_22.png)
+
+For authentication we have to use the following entry point: 
+
+- "authorization_endpoint": "http://localhost:8180/realms/bankApp/protocol/openid-connect/auth",
+- we can set postman with params url and copy to browser
+- we're redirected to keycloak login page and will be redirected after successful authentication 
+- params are: 
+  - client_id: bankClient
+  - response_tyoe: code
+  - scope: openid
+  - redirect_uri : same url as defined in keycloak
+  - state: some random string
+
+
+![img_20.png](img_20.png)
+
+After login, note we receive a session state in URL and a code :
+http://localhost:4200/noclientUrl?state=someRandomValue&session_state=48edf6ea-4dc6-416a-8fe9-6d23f217d9a8&code=3c6f91c4-ac2d-4dc5-be70-c4e631a6cacb.48edf6ea-4dc6-416a-8fe9-6d23f217d9a8.9f28bd0c-1816-4584-9b38-e1d9e2382645
+![img_21.png](img_21.png)
+
+With the code we are building url to get access token: 
+If we check well knowns URLs, here:
+http://localhost:8180/realms/bankApp/.well-known/openid-configuration
+
+We can find token endpoint:
+"token_endpoint": "http://localhost:8180/realms/bankApp/protocol/openid-connect/token",
+
+Using code we can then call entry point for getting bearer token :
+code: 3c6f91c4-ac2d-4dc5-be70-c4e631a6cacb.48edf6ea-4dc6-416a-8fe9-6d23f217d9a8.9f28bd0c-1816-4584-9b38-e1d9e2382645
+
+We call: 
+- http://localhost:8180/realms/bankApp/protocol/openid-connect/token
+- with params: 
+  - client_id: bankClient
+  - client_secret
+  - grant_type: authorization_code
+  - code: code retrieve 
+  - redirect_uri : same url as defined in keycloak 
+  - scope: openid
+
+With retrieved token, we can call any authenticated entrypoint:
+- http://localhost:8080/myBalance?email=me@me.com
+
+**Using Authorization code grant type with PKCE**
+PKCE enhances authorization code grant: PKCE means Proof Key for Code Exchange
+
+- When public clients request access token, some additional security concerns are posed that are not mitigated by the 
+  authorization code flow alone. This is because public client cannot securely store a client secret
+- Given the situation, OAuth2 provides a version of the authorization Code Flow for public client applications which 
+  uses a Proof Key for Code Exchange
+
+The PKCE follow the following steps: 
+1. once user clicks for login, client app creates a cryprographically random code_verifier and from this generates a 
+   code_challenge
+2. code challenge is a base 64 URL encoded string of the SHA256 hash of the code verifier
+3. redirects the user to the authorization server along with the code challenge
+4. Authorization server stores the code_challenge and redirects the user back to the application with an authorization 
+   code which can be used one time
+5. client application send the authorization code and the code verifier (step1) to the authorization server
+6. Authorization server checks the code_challenge and the code_verifier. if they are valid, the it responds with ID 
+   token and access token  
+
+At step 2 & 3, following details are required: 
+- client_id
+- redirect_uri
+- scope
+- state: CSRF token value
+- response_type: code
+- code_challenge: code challenge generated
+- code_challenge_method: S256
+
+At step 5: 
+- code
+- client_id & client_secret(optional)
+- grant_type
+- redirect_uri
+- code_verifier
+
+In keyCloack: 
+- Create a new client: 
+![img_23.png](img_23.png)
+- Select standard flow
+![img_24.png](img_24.png)
+- Set the redirect url and logout: 
+![img_26.png](img_26.png)
+- Click on save
+
+In advanced settings tab: 
+- set Proof Key for Code Exchange Code Challenge Method 
+![img_27.png](img_27.png)
+- Select 256
+
+
+## Important Links
+- Spring website to generate projects - https://start.spring.io/
+- Spring Website - https://spring.io/
+- Spring Projects website - https://spring.io/projects
+- Spring Boot properties - https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html
+- AWS website - https://aws.amazon.com/
+- SQLECTRON website - https://sqlectron.github.io
+- Free MySQL DB website - https://www.freemysqlhosting.net
+- OAuth2 Website - https://oauth.net/2/
+- OAuth2 playground - https://www.oauth.com/playground/
+- KeyCloak website - https://www.keycloak.org
+- KeyCloak Download page - https://www.keycloak.org/downloads
+- KeyCloak setup - https://www.keycloak.org/getting-started/getting-started-zip
+- KeyCloak guides - https://www.keycloak.org/guides
+- KeyCloak Well known APIs - http://localhost:8180/realms/eazybankdev/.well-known/openid-configuration
+- Angular Keycloak library - https://www.npmjs.com/package/keycloak-angular
+- Keycloak official documentation - https://www.keycloak.org/documentation
+- Keycloak Admin REST APIs - https://www.keycloak.org/docs-api/19.0.2/rest-api/index.html

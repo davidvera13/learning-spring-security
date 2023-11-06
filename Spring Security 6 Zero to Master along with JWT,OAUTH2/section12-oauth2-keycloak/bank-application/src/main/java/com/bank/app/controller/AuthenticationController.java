@@ -21,33 +21,40 @@ import java.util.List;
 public class AuthenticationController {
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private final PasswordEncoder passwordEncoder;
+    //private final PasswordEncoder passwordEncoder;
+
+    //@Autowired
+    //public AuthenticationController(
+    //        UserService userService,
+    //        PasswordEncoder passwordEncoder) {
+    //    this.userService = userService;
+    //    this.passwordEncoder = passwordEncoder;
+    //    this.modelMapper = new ModelMapper();
+    //}
 
     @Autowired
     public AuthenticationController(
-            UserService userService,
-            PasswordEncoder passwordEncoder) {
+            UserService userService) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
         this.modelMapper = new ModelMapper();
     }
 
-    @PostMapping(
-            value = "/register",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<Object> createUser(@RequestBody CustomerRequest customer) {
-        String encodedPassword = passwordEncoder.encode(customer.getPwd());
-        customer.setPwd(encodedPassword);
-        CustomerDto customerDto = modelMapper.map(customer, CustomerDto.class);
-        CustomerDto response = userService.createUser(customerDto);
-        if(response != null)
-            return new ResponseEntity<>(
-                    modelMapper.map(response, CustomerResponse.class),
-                    HttpStatus.CREATED);
-        return ResponseEntity.internalServerError().body("An exception was thrown");
-    }
+    //@PostMapping(
+    //        value = "/register",
+    //        consumes = MediaType.APPLICATION_JSON_VALUE,
+    //        produces = MediaType.APPLICATION_JSON_VALUE
+    //)
+    //public ResponseEntity<Object> createUser(@RequestBody CustomerRequest customer) {
+    //    String encodedPassword = passwordEncoder.encode(customer.getPwd());
+    //    customer.setPwd(encodedPassword);
+    //    CustomerDto customerDto = modelMapper.map(customer, CustomerDto.class);
+    //    CustomerDto response = userService.createUser(customerDto);
+    //    if(response != null)
+    //        return new ResponseEntity<>(
+    //                modelMapper.map(response, CustomerResponse.class),
+    //                HttpStatus.CREATED);
+    //    return ResponseEntity.internalServerError().body("An exception was thrown");
+    //}
 
     // john@doe.com abc123
     @RequestMapping("/users")

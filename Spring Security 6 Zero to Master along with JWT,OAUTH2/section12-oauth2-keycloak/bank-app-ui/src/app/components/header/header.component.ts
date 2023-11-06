@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from 'src/app/model/user.model';
+import {KeycloakService} from "keycloak-angular";
+import {KeycloakProfile} from "keycloak-js";
 
 @Component({
   selector: 'app-header',
@@ -9,15 +11,33 @@ import { User } from 'src/app/model/user.model';
 export class HeaderComponent implements OnInit {
   
   user = new User();
+  public isLoggedIn = false;
+  public userProfile: KeycloakProfile | null = null;
 
-  constructor() {
+  constructor(private readonly keycloak: KeycloakService) {
     
   }
 
-  ngOnInit() {
-    if(sessionStorage.getItem('userdetails')){
-      this.user = JSON.parse(sessionStorage.getItem('userdetails')!);
+  async ngOnInit() {
+    this.isLoggedIn = await this.keycloak.isLoggedIn();
+    if (this.isLoggedIn) {
+      this.userProfile = await this.keycloak.loadUserProfile();
+      this.user.authStatus = 'AUTH';
+      this.user.name = this.userProfile.firstName || "";
+      window.sessionStorage.setItem("userdetails",JSON.stringify(this.user));
+
     }
+    //if(sessionStorage.getItem('userdetails')){
+    //  this.user = JSON.parse(sessionStorage.getItem('userdetails')!);
+    //}
   }
 
+  public login(): void {
+    this.keycloak.login();
+  }
+
+  public logout(): void {
+    let redirectURI: string = "http://localhost:4200/home";
+    this.keycloak.logout(redirectURI);
+  }
 }

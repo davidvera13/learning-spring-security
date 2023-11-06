@@ -1,5 +1,6 @@
 package com.bank.app.config.security;
 
+import com.bank.app.config.KeycloakRoleConverter;
 import com.bank.app.config.security.filters.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
@@ -46,11 +48,11 @@ public class AppSecurityConfig {
                         .ignoringRequestMatchers("/auth/register")
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
-                .addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
-                .addFilterAfter(new JwtTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JwtTokenValidatorFilter(), BasicAuthenticationFilter.class)
+                //.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class)
+                //.addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class)
+                //.addFilterAfter(new AuthoritiesLoggingAfterFilter(), BasicAuthenticationFilter.class)
+                //.addFilterAfter(new JwtTokenGeneratorFilter(), BasicAuthenticationFilter.class)
+                //.addFilterBefore(new JwtTokenValidatorFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/myAccount").hasRole("USER")
                         .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
@@ -59,8 +61,11 @@ public class AppSecurityConfig {
                         .requestMatchers("/myCards").hasRole("USER")
                         .requestMatchers( "/contact", "/auth/users").authenticated()
                         .requestMatchers("/notices", "/auth/register").permitAll())
-                .formLogin(withDefaults())
-                .httpBasic(withDefaults())
+                //.formLogin(withDefaults())
+                //.httpBasic(withDefaults())
+                .oauth2ResourceServer(oauth2ResourceServerCustomizer ->
+                                oauth2ResourceServerCustomizer.jwt(jwtCustomizer ->
+                                        jwtCustomizer.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .build();
     }
 
@@ -75,11 +80,10 @@ public class AppSecurityConfig {
     }
 
     // Argon2PasswordEncoder > SCryptPasswordEncoder > BCryptPasswordEncoder > PasswordEncoder
-    @Bean
-    PasswordEncoder passwordEncoder() {
-        // we can add salt to password  (log round)
-        return new BCryptPasswordEncoder();
-    }
+    //@Bean
+    //PasswordEncoder passwordEncoder() {
+    //    return new BCryptPasswordEncoder();
+    //}
 
     private CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -99,5 +103,11 @@ public class AppSecurityConfig {
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf");
         return requestHandler;
+    }
+
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(new KeycloakRoleConverter());
+        return converter;
     }
 }

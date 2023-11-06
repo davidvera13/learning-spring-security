@@ -27,4 +27,9 @@ public class AccountTransactionServiceImpl implements AccountTransactionService 
         return new ModelMapper()
                 .map(accountTransactionEntities, new TypeToken<List<AccountTransactionDto>>() {}.getType());
     }
+
+    @Override
+    public List<AccountTransactionDto> findByCustomerEmailByTransactionDtDesc(String email) {
+        return null;
+    }
 }
